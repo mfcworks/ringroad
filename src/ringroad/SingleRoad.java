@@ -90,28 +90,6 @@ public class SingleRoad implements Road {
 		return cars;
 	}
 
-	/*
-	/ **
-	 * 最大n台、交差点へ移動できる。
-	 * 一車線道路なので、0 <= n <= 1 の必要がある。
-	 * /
-	public Car[] moveFrom(int n) {
-		if (n > 1) {
-			throw new IllegalArgumentException(
-					"SingleRoadのインスタンスに1以上の移動台数が要求されました: " + n);
-		}
-
-		Car[] transfer;
-		if (n == 1 && road[road.length-1] != null) {
-			transfer = new Car[1];
-			transfer[0] = road[road.length-1];
-			road[road.length-1] = null;
-		} else {
-			transfer = new Car[0];
-		}
-		return transfer;
-	}
-	*/
 
 
 
@@ -120,7 +98,7 @@ public class SingleRoad implements Road {
 	 */
 	public boolean trySpawn(int step) {
 		if (road[step - 1] == null) {
-			road[step - 1] = new Car();
+			road[step - 1] = new Car(x, y, isec, step);
 			return true;
 		} else {
 			return false;
