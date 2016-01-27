@@ -115,63 +115,99 @@ public class Car {
 		// origXとdestXが、中心からの角度が 2rad 以上ある場合、内側を通ったほうが近くなる。
 		// 2rad 未満の場合、外側を通ったほうが近くなる。
 
-		int moveX;
+		/*
+		 * ルーティング実装
+		 * 交差点を経由するすべての車は、次の3つの順序でフィールドを通過する
+		 * 1. 放射道路を上る(中心側へ行く) : inbound≧0
+		 * 		外回りで放射道路を通行しない車は放射道路を移動しない
+		 * 		外回りで目的地が出発地より内側にある場合、放射道路を動く
+		 * 		内回りの場合、最内側の交差点まで動く
+		 * 2. 環状道路を回る : ±ring
+		 * 		環状道路を回らない場合、環状道路を移動しない
+		 * 		正回りの場合ring>0、負回りの場合ring<0
+		 * 3. 放射道路を下る(外側へ行く) : outbound≧0
+		 * 		外回りで目的地が出発地より外側にある場合、放射道路を動く
+		 * 		内回りの場合、目的地の交差点まで動く
+		 */
 
-		int xdir; // 1=正回り, 0=X方向移動なし, -1=負回り  (正回りとは、xのインデックス増大方向に動くこと)
+		// routeの一番最初は初めて通る交差点
+
+
+		int inbound;	// 上り方向の移動数
+		int ring;		// X方向の移動数(符号付き)
+		int outbound;	// 下り方向の移動数
+
+		// X方向：正回りor負回りを決める
 		if (origX == destX) {
 			// X方向移動なし
-			xdir = 0;
-			moveX = 0; // X方向の移動数
-		} else {
-			// X方向: 正回りor負回りを決定
-			if (destX > origX) {
-				int dox = destX - origX;
-				if (dox <= numX - dox) {
-					xdir = 1; // 正回り
-					moveX = dox;
-				} else {
-					xdir = -1; // 負回り
-					moveX = numX - dox;
-				}
-			} else {
-				// @when (destX < origX)
-				int odx = origX - destX;
-				if (odx <= numX - odx) {
-					xdir = -1; // 負回り
-					moveX = odx;
-				} else {
-					xdir = 1; // 正回り
-					moveX = numX - odx;
-				}
-			}
+			ring = 0;
+		} else if (origX < destX) {
+			int t = destX - origX;
+			ring = (t <= numX/2 ? t : numX-t);
+		} else /* @when (origX > destX) */ {
+			int t = origX - destX;
+			ring = (t <= numX/2 ? -t : numX-t);
 		}
 
-		int moveY;
-		int ydir; // 1=下り, 0=Y方向移動なし, -1=上り  (下りとは、yのインデックス増大方向(外方向)に動くこと)
-		if (origY == destY) {
-			// Y方向移動なし
-			ydir = 0;
-			moveY = 0;
-		} else {
-			// Y方向: 下りor上りを決定
-			if (origY < destY) {
-				ydir = 1;
-				moveY = destY - origY;
-			}
-			else {
-				ydir = -1;
-				moveY = origY - destY;
-			}
-		}
-
-		int dir; // 外回りor内回りを決定  (1=外回り=外側指向, 0=内回り=内側指向)
-		if (2*Math.PI*moveX/numX <= 2/*[rad]*/) {
+		// 外回りor内回りを決める  (1=外回り=外側指向, 0=内回り=内側指向)
+		int dir;
+		if (2*Math.PI*ring/numX <= 2/*[rad]*/) {
 			dir = 1; // 2rad未満のとき、外回り
 		} else {
 			dir = 0; // 2rad以上のとき、内回り
 		}
 
+		// inboundを求める
+		if (dir == 0) {
+			// 内回りの場合
+			inbound = origY;
+		} else if (origY > destY) {
+			// 外回りで目的地のほうが内側にある場合
+			inbound = destY - origY;
+		} else {
+			inbound = 0;
+		}
+
+		// outboundを求める
+		if (dir == 0) {
+			// 内回りの場合
+			outbound = destY;
+		} else if (origY < destY) {
+			// 外回りで目的地のほうが外側にある場合
+			outbound = destY - origY;
+		} else {
+			outbound = 0;
+		}
+
+
 		// これ以降、実際に経路をセットしていく
+		int idx = 0;
+		int curX = origX;
+		int curY = origY;
+
+		for (int i = 0; i < inbound + 1; i++) {
+			route[idx][0] = curX;
+			route[idx][1] = curY - i;
+			route[idx][2] = 1; // 上り方向
+			idx++;
+		}
+		curX = route[idx][0];
+		curY = route[idx][1];
+
+		for (int i = 0; i < Math.abs(ring) + 1; i++) {
+			route[idx][0] = curX;
+			route[idx][1] = curY;
+			route[idx][2] = (ring > 0 ? 2 : 0); // 正回りor負回り
+			idx++;
+		}
+
+
+		for (int i = 0; i < outbound + 1; i++) {
+
+		}
+
+
+
 		if (xdir == 0 && ydir == 0) {
 			// 出発地が自分の交差点サイト内か、接続してくる道路サイト内にいて、
 			// 目的地も自分の交差点内にある場合
