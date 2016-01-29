@@ -25,7 +25,9 @@ public class Car {
 	private int routeStep;
 
 	/**
-	 * コンストラクタ。車を生成する
+	 * コンストラクタ。
+	 * 出発地を指定して車を作成します。
+	 * 目的地はランダムに決定されます。
 	 *
 	 * @param x    出発地のx座標
 	 * @param y    出発地のy座標
@@ -48,7 +50,9 @@ public class Car {
 
 	}
 
-	// 目的地を決定する
+	/**
+	 * 目的地をランダムに決定します。
+	 */
 	private void setDestination() {
 		Random random = new Random();
 
@@ -75,8 +79,10 @@ public class Car {
 		} while (flag);
 	}
 
-
-	// 経路を決定する
+	/**
+	 * 出発地から目的地までの経路を決定し、経路情報を
+	 * 配列変数 route に格納します。
+	 */
 	private void setRoute() {
 		int numX = field.intersections.length;
 		int numY = field.intersections[0].length;
@@ -130,9 +136,6 @@ public class Car {
 		 * 		内回りの場合、目的地の交差点まで動く
 		 */
 
-		// routeの一番最初は初めて通る交差点
-
-
 		int inbound;	// 上り方向の移動数
 		int ring;		// X方向の移動数(符号付き)
 		int outbound;	// 下り方向の移動数
@@ -182,38 +185,47 @@ public class Car {
 
 		// これ以降、実際に経路をセットしていく
 		int idx = 0;
-		int curX = origX;
-		int curY = origY;
+		// 出発地を代入
+		route[idx][0] = origX;
+		route[idx][1] = origY;
 
-		for (int i = 0; i < inbound + 1; i++) {
-			route[idx][0] = curX;
-			route[idx][1] = curY - i;
+		for (int i = 0; i < inbound; i++) {
+			// 方向
 			route[idx][2] = 1; // 上り方向
 			idx++;
+			// その結果たどり着く交差点
+			route[idx][0] = route[idx-1][0];
+			route[idx][1] = route[idx-1][1] - 1;
 		}
-		curX = route[idx][0];
-		curY = route[idx][1];
 
-		for (int i = 0; i < Math.abs(ring) + 1; i++) {
-			route[idx][0] = curX/**/;
-			route[idx][1] = curY;
+		for (int i = 0; i < Math.abs(ring); i++) {
+			// 方向
 			route[idx][2] = (ring > 0 ? 2 : 0); // 正回りor負回り
 			idx++;
+			// その結果たどり着く交差点
+			route[idx][0] = (ring > 0 ?
+					/*正回り*/ (route[idx-1][0]==field.numX-1 ? 0 : route[idx-1][0]+1) :
+					/*負回り*/ (route[idx-1][0]==0 ? field.numX-1 : route[idx-1][0]-1));
+			route[idx][1] = route[idx-1][1];
 		}
-		curX = route[idx][0];
-		curY = route[idx][1];
 
-		for (int i = 0; i < outbound + 1; i++) {
-			route[idx][0] = curX;
-			route[idx][1] = curY;
-			route[idx][2] = 3;
+		for (int i = 0; i < outbound; i++) {
+			// 方向
+			route[idx][2] = 3; // 下り方向
 			idx++;
+			// その結果たどり着く交差点
+			route[idx][0] = route[idx-1][0];
+			route[idx][1] = route[idx-1][1] + 1;
 		}
 
-		route[idx][2] = 000/*destination dir*/;
+		// 最後の交差点を抜ける方向
+		route[idx][2] = destination[2];
 
-		//最後にダミー値を入れておく。
-
+		// とりあえず最後にダミー値を入れておく。
+		idx++;
+		route[idx][0] = -1;
+		route[idx][1] = -1;
+		route[idx][2] = -1;
 	}
 
 
@@ -221,5 +233,15 @@ public class Car {
 	// 次の交差点で抜ける交差点番号を返す
 	public int outIsec() {
 		return 0;//XXX
+	}
+
+
+	// 経路情報をコンソールに出力します。
+	public void routeInfo() {
+		for (int i = 0; ; i++) {
+			if (route[i][0] == -1) break;
+			System.out.print("(" + route[i][0] + "," + route[i][1] + ")");
+		}
+		System.out.println();
 	}
 }

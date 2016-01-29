@@ -11,6 +11,8 @@ public class Field {
 	// 交差点の2次元配列
 	public Intersection[][] intersections;
 	public int rc;
+	public int numX;
+	public int numY;
 	public int dY;
 
 	/**
@@ -25,6 +27,8 @@ public class Field {
 		// 例によってField情報をCarに置いておく。
 		Car.field = this;
 
+		this.numX = numX;
+		this.numY = numY;
 		this.rc = rc;
 		this.dY = dY;
 
@@ -50,7 +54,7 @@ public class Field {
 		for (int x = 0; x < numX; x++) {
 			for (int y = 0; y < numY; y++) {
 				intersections[x][y].connect(
-						(x == 0 ? intersections[numY-1][y] : intersections[x-1][y]),
+						(x == 0 ? intersections[numX-1][y] : intersections[x-1][y]),
 						(y == 0 ? null : intersections[x][y-1]),
 						(x == numX-1 ? intersections[0][y] : intersections[x+1][y]),
 						(y == numY-1 ? null : intersections[x][y+1]));

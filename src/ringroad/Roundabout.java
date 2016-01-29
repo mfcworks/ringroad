@@ -70,6 +70,7 @@ public class Roundabout implements Intersection {
 	 * @param is3 この交差点の交差点番号3から伸びる道路サイトの先に接続する交差点
 	 */
 	public void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3) {
+		neighbors = new Intersection[4];
 		neighbors[0] = is0;
 		neighbors[1] = is1;
 		neighbors[2] = is2;
