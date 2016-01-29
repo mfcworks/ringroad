@@ -9,6 +9,8 @@ public interface Intersection {
 	public int x();
 	public int y();
 
+	public int numCarsByPosition(int isec, int step);
+
 	public Intersection[] neighbors();
 
 	// 交差点番号isecに接続されている道路サイトの長さを返す

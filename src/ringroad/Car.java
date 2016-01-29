@@ -195,89 +195,26 @@ public class Car {
 		curY = route[idx][1];
 
 		for (int i = 0; i < Math.abs(ring) + 1; i++) {
-			route[idx][0] = curX;
+			route[idx][0] = curX/**/;
 			route[idx][1] = curY;
 			route[idx][2] = (ring > 0 ? 2 : 0); // 正回りor負回り
 			idx++;
 		}
-
+		curX = route[idx][0];
+		curY = route[idx][1];
 
 		for (int i = 0; i < outbound + 1; i++) {
-
+			route[idx][0] = curX;
+			route[idx][1] = curY;
+			route[idx][2] = 3;
+			idx++;
 		}
 
+		route[idx][2] = 000/*destination dir*/;
 
-
-		if (xdir == 0 && ydir == 0) {
-			// 出発地が自分の交差点サイト内か、接続してくる道路サイト内にいて、
-			// 目的地も自分の交差点内にある場合
-			route[0][0] = origX;
-			route[0][1] = origY;
-			route[0][2] = destination[ISEC];
-
-		} else if (xdir == 0) {
-			// y方向にのみ進む
-			int i;
-			for (i = 0; i < moveY; i++) {
-				route[i][0] = origX;
-				route[i][1] = origY + (ydir * i);
-				route[i][2] = (ydir == 1 ? 3 : 1);
-			}
-			route[i-1][2] = destination[ISEC];
-
-		} else {
-			// x方向の動きがある場合
-			if (dir == 1) {
-				// 外回り
-				if (ydir == 0) {
-					// x方向へ移動するだけ
-				} else if (ydir == -1) {
-					// y方向へ動いてからx方向へ動く
-				} else /* @when (ydir == 1) */ {
-					// x方向へ動いてからy方向へ動く
-
-				}
-
-/*
-				int i;
-
-				for (i = 0; i < moveY; i++) {
-					route[i][0] = origX;
-					route[i][1] = origY + (i * ydir);
-					route[i][2] = (ydir > 0 ? 3 : 1);
-				}
-				if (i == 0) {
-					route[0][0] = origX;
-					route[0][1] = origY;
-					route[0][2] = ?;
-				} else {
-					i--;
-				}
-*/
-
-			} else {
-				// 内回り
-
-
-
-			}
-
-			/*
-			// x方向にのみ進む
-			int i;
-			for (i = 0; i < moveX; i++) {
-				route[i][0] = (origX + (xdir * i)) % numX;
-				route[i][1] = origY;
-				route[i][2] = (xdir == 1 ? 2 : 0);
-			}
-			route[i-1][2] = destination[ISEC];
-*/
-
-		}
+		//最後にダミー値を入れておく。
 
 	}
-
-
 
 
 

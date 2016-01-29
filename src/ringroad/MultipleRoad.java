@@ -40,6 +40,10 @@ public class MultipleRoad implements Road {
 		return roadSites.length;
 	}
 
+	public int carsAt(int step) {
+		return roadSites[step].size();
+	}
+
 	/**
 	 * 内部サイトのアップデート
 	 *

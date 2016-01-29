@@ -93,4 +93,12 @@ public class Field {
 		// TODO: 未実装
 		return -1;
 	}
+
+
+	/**
+	 * 描画用インターフェース：指定した位置のサイトに入っている車の台数を取得する
+	 */
+	public int numCarsByPosition(int x, int y, int isec, int step) {
+		return intersections[x][y].numCarsByPosition(isec, step);
+	}
 }

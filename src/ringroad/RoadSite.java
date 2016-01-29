@@ -40,6 +40,10 @@ public class RoadSite {
 		return (nMax - list.size());
 	}
 
+	public int size() {
+		return list.size();
+	}
+
 	//====================
 	// 車の移動
 	//====================

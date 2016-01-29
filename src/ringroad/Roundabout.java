@@ -32,6 +32,13 @@ public class Roundabout implements Intersection {
 		return y;
 	}
 
+	public int numCarsByPosition(int isec, int step) {
+		if (step == 0)
+			return (roundabout[isec] == null ? 0 : 1);
+		else
+			return roads[isec].carsAt(step);
+	}
+
 	/**
 	 * コンストラクタ
 	 *

@@ -43,6 +43,10 @@ public class SingleRoad implements Road {
 		return (road[0] == null ? 1 : 0);
 	}
 
+	public int carsAt(int step) {
+		return (road[step] == null ? 0 : 1);
+	}
+
 
 	/**
 	 * 内部サイトのアップデート

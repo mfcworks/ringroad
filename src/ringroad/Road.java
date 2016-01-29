@@ -9,6 +9,9 @@ public interface Road {
 	// 道路長を返す
 	public int length();
 
+	//
+	public int carsAt(int step);
+
 	/*
 	 * 道路の内部サイトをアップデートするメソッド
 	 */
