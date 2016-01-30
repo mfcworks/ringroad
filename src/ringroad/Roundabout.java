@@ -42,24 +42,21 @@ public class Roundabout implements Intersection {
 	/**
 	 * コンストラクタ
 	 *
+	 * @param x, y : この交差点の位置情報
 	 * @param len0, len1, len2, len3 : 各交差点番号に接続する道路の長さ
 	 * @param n0, n1, n2, n3 : 各交差点番号に接続する道路の車線数
 	 */
-	public Roundabout(int len0, int len1, int len2, int len3, int n0, int n1, int n2, int n3) {
-		// 道路サイトのオブジェクトを生成
-		roads = new Road[4];
-		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(len0) : new MultipleRoad(len0, n0)));
-		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(len1) : new MultipleRoad(len1, n1)));
-		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(len2) : new MultipleRoad(len2, n2)));
-		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(len3) : new MultipleRoad(len3, n3)));
-	}
-
-	/**
-	 * この交差点の位置情報を覚えておく
-	 */
-	public void setPosition(int x, int y) {
+	public Roundabout(int x, int y, int len0, int len1, int len2, int len3, int n0, int n1, int n2, int n3) {
 		this.x = x;
 		this.y = y;
+		// 道路サイトのオブジェクトを生成
+		roads = new Road[4];
+		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(x, y, len0) : new MultipleRoad(x, y, len0, n0)));
+		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(x, y, len1) : new MultipleRoad(x, y, len1, n1)));
+		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(x, y, len2) : new MultipleRoad(x, y, len2, n2)));
+		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(x, y, len3) : new MultipleRoad(x, y, len3, n3)));
+		// この交差点のサイト
+		roundabout = new Car[4];
 	}
 
 	/**

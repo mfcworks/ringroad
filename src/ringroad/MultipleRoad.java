@@ -18,6 +18,9 @@ public class MultipleRoad implements Road {
 	 */
 	RoadSite[] roadSites;
 
+	// 位置情報
+	private int x;
+	private int y;
 
 
 	/**
@@ -26,7 +29,10 @@ public class MultipleRoad implements Road {
 	 * @param length 道路長
 	 * @param n      車線数
 	 */
-	public MultipleRoad(int length, int n) {
+	public MultipleRoad(int x, int y, int length, int n) {
+		this.x = x;
+		this.y = y;
+
 		roadSites = new RoadSite[length];
 		for (int i = 0; i < length; i++) {
 			roadSites[i] = new RoadSite(n);

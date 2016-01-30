@@ -49,17 +49,64 @@ public class FieldView extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// test
-		test(g, 0, 0, 0);
-
 		if (field == null) return;
 
 		// 描画の開始
 		//
 
-		// 背景
-		g.setColor(Color.BLUE);
+		// 背景初期化
+		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
+
+		g.setColor(Color.BLACK);
+
+		// 描画パネルの中心座標
+		int cx = getWidth() / 2;
+		int cy = getHeight() / 2;
+
+
+		for (int numy = 0; numy < field.numY; numy++) {
+
+			int dx = (int) Math.round((field.rc + (field.dY * numy)) * 2 * Math.PI / field.numX);
+			int n = (dx + 2) * field.numX; // ラウンドアバウトの場合を仮定
+
+			double radius = R * n / Math.PI; // 必要半径
+
+			// 環状道路の内側車線を描画
+			for (int i = 0; i < n; i++) {
+				double x = (cx + radius * Math.cos(2*Math.PI*i/n));
+				double y = (cy + radius * Math.sin(2*Math.PI*i/n));
+				fillPoint(g, (int) x, (int) y);
+			}
+			radius += 2*R;
+			// 環状道路の外側車線を描画
+			for (int i = 0; i < n; i++) {
+				double x = (cx + radius * Math.cos(2*Math.PI*i/n));
+				double y = (cy + radius * Math.sin(2*Math.PI*i/n));
+				fillPoint(g, (int) x, (int) y);
+			}
+
+			// 放射道路を描画
+			if (numy == field.numY - 1) break;
+
+			double rad = radius + 2*R;
+			for (int numx = 0; numx < field.numX; numx++) {
+
+				for (int dy = 0; dy < field.dY; dy++) {
+					double x = cx + (rad + dy*2*R) * Math.cos(2*Math.PI*numx/field.numX);
+					double y = cy + (rad + dy*2*R) * Math.sin(2*Math.PI*numx/field.numX);
+
+					double rx = R * Math.sin(2*Math.PI*numx/field.numX);
+					double ry = R * Math.cos(2*Math.PI*numx/field.numX);
+
+					// どっちもどっちか？
+				//	fillPoint(g, (int) (x-rx), (int) (y+ry));
+				//	fillPoint(g, (int) (x+rx), (int) (y-ry));
+					fillPoint(g, (int) Math.round(x-rx), (int) Math.round(y+ry));
+					fillPoint(g, (int) Math.round(x+rx), (int) Math.round(y-ry));
+				}
+			}
+		}
 	}
 
 
@@ -71,6 +118,14 @@ public class FieldView extends JPanel {
 		int yy = (int) Math.round(y - r);
 		int rr = (int) Math.round(r * 2);
 		g.fillOval(xx, yy, rr, rr);
+	}
+
+	void fillPoint(Graphics g, int x, int y) {
+		g.fillRect(x, y, 1, 1);
+		g.fillRect(x, y-1, 1, 1);
+		g.fillRect(x, y+1, 1, 1);
+		g.fillRect(x-1, y, 1, 1);
+		g.fillRect(x+1, y, 1, 1);
 	}
 
 	public void test(Graphics g, int numX, int numY, int rc) {
@@ -100,17 +155,20 @@ public class FieldView extends JPanel {
 		for (int i = 0; i < n; i++) {
 			double x = (cx + radius * Math.cos(2*Math.PI*i/n));
 			double y = (cy + radius * Math.sin(2*Math.PI*i/n));
-			fillCircle(g, x, y, R);
+			//fillCircle(g, x, y, R);
+			fillPoint(g, (int) x, (int) y);
 		}
 		radius += 2*R;
 		// 環状道路の外側車線を描画
 		for (int i = 0; i < n; i++) {
 			double x = (cx + radius * Math.cos(2*Math.PI*i/n));
 			double y = (cy + radius * Math.sin(2*Math.PI*i/n));
-			fillCircle(g, x, y, R);
+			//fillCircle(g, x, y, R);
+			fillPoint(g, (int) x, (int) y);
+
 		}
 
-		numY = 9;
+		numY = 8;
 		int dY = 10;
 		// 放射道路を描画
 		double rad = radius + 2*R;
@@ -122,8 +180,14 @@ public class FieldView extends JPanel {
 				double rx = R * Math.sin(2*Math.PI*numy/numY);
 				double ry = R * Math.cos(2*Math.PI*numy/numY);
 
-				fillCircle(g, x-rx, y+ry, R);
-				fillCircle(g, x+rx, y-ry, R);
+				//fillCircle(g, x-rx, y+ry, R);
+				//fillCircle(g, x+rx, y-ry, R);
+				// どっちもどっちか？
+			//	fillPoint(g, (int) (x-rx), (int) (y+ry));
+			//	fillPoint(g, (int) (x+rx), (int) (y-ry));
+				fillPoint(g, (int) Math.round(x-rx), (int) Math.round(y+ry));
+				fillPoint(g, (int) Math.round(x+rx), (int) Math.round(y-ry));
+
 			}
 		}
 
@@ -134,5 +198,7 @@ public class FieldView extends JPanel {
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(500, 500);
+		Field field = new Field(8, 8, 3, 8);
+		view.draw(field);
 	}
 }

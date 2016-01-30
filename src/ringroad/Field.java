@@ -34,6 +34,10 @@ public class Field {
 
 		intersections = new Intersection[numX][numY];
 
+		// DEBUG
+		System.out.println("Field initializing...");
+		System.out.println("放射道路の区間長: " + dY);
+
 		// 交差点オブジェクトの生成
 		for (int x = 0; x < numX; x++) {
 			for (int y = 0; y < numY; y++) {
@@ -45,8 +49,9 @@ public class Field {
 				int n3 = (y == numY-1 ? 0 : dY);
 
 				// XXX: とりあえず全て1車線道路。
-				intersections[x][y] = new Roundabout(n02, n1, n02, n3, 1, 1, 1, 1);
-				intersections[x][y].setPosition(x, y);
+				intersections[x][y] = new Roundabout(x, y, n02, n1, n02, n3, 1, 1, 1, 1);
+
+				if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02);
 			}
 		}
 
@@ -71,17 +76,14 @@ public class Field {
 	public void initialize(int n) {
 		Random random = new Random();
 
-		int nx = intersections.length;
-		int ny = intersections[0].length;
-
 		for (int i = 0; i < n; i++) {
 			int rx, ry, ri, rs;
 			boolean flag = false;
 			do {
-				rx = random.nextInt(nx);
-				ry = random.nextInt(ny);
+				rx = random.nextInt(numX);
+				ry = random.nextInt(numY);
 				ri = random.nextInt(4);
-				int ni = intersections[nx][ny].lengthAt(ri);
+				int ni = intersections[rx][ry].lengthAt(ri);
 				if (ni == 0) continue;
 				rs = random.nextInt(ni);
 				flag = intersections[rx][ry].trySpawn(ri, rs);

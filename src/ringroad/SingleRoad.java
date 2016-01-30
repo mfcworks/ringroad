@@ -25,9 +25,14 @@ public class SingleRoad implements Road {
 	/**
 	 * コンストラクタ
 	 *
+	 * @param x この道路を持つ交差点のX座標
+	 * @param y この道路を持つ交差点のY座標
 	 * @param length 道路長
 	 */
-	public SingleRoad(int length) {
+	public SingleRoad(int x, int y, int length) {
+		System.out.println("SingleRoad " + length + " at (" + x + "," + y + ")");
+		this.x = x;
+		this.y = y;
 		road = new Car[length];
 	}
 

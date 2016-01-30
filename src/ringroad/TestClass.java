@@ -11,6 +11,9 @@ public class TestClass {
 		int dy = 5; // 放射道路の間隔
 		Field field = new Field(rc, x, y, dy);
 		System.out.println("Field init ok.");
+
+		field.initialize(2);
+		System.out.println("Car initialize ok.");
 	}
 
 }

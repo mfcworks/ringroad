@@ -16,7 +16,6 @@ public interface Intersection {
 	// 交差点番号isecに接続されている道路サイトの長さを返す
 	public int lengthAt(int isec);
 
-	public void setPosition(int x, int y);
 
 	public void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3);
 

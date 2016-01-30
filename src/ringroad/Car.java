@@ -37,6 +37,9 @@ public class Car {
 	public Car(int x, int y, int isec, int step) {
 		origin = new int[] {x, y, isec, step};
 
+		System.out.println("Car is being created:");
+		System.out.println("  origin: {" + origin[0] + "," + origin[1] + "," + origin[2] + "," + origin[3] + "}");
+
 		curPosX = x;
 		curPosY = y;
 		curIsec = isec;
@@ -48,6 +51,9 @@ public class Car {
 		setRoute();
 		routeStep = 0;
 
+		// DEBUG
+		System.out.println("  destination: {" + destination[0] + "," + destination[1] + "," + destination[2] + "," + destination[3] + "}");
+		routeInfo();
 	}
 
 	/**
@@ -59,13 +65,13 @@ public class Car {
 		int nx = field.intersections.length;
 		int ny = field.intersections[0].length;
 
-		boolean flag = false;
+		boolean flag = true;
 		int rx, ry, ri, rs;
 		do {
 			rx = random.nextInt(nx);
 			ry = random.nextInt(ny);
 			ri = random.nextInt(4);
-			int ni = field.intersections[nx][ny].lengthAt(ri);
+			int ni = field.intersections[rx][ry].lengthAt(ri);
 			if (ni == 0) continue;
 			rs = random.nextInt(ni);
 			// 出発地と完全に一致した場合は抽選し直し
@@ -75,7 +81,7 @@ public class Car {
 				origin[STEP] == rs) continue;
 			// 目的地を保存する
 			destination = new int[] {rx, ry, ri, rs};
-			flag = true;
+			flag = false;
 		} while (flag);
 	}
 
