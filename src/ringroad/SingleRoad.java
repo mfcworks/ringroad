@@ -30,7 +30,7 @@ public class SingleRoad implements Road {
 	 * @param length 道路長
 	 */
 	public SingleRoad(int x, int y, int length) {
-		System.out.println("SingleRoad " + length + " at (" + x + "," + y + ")");
+//		System.out.println("SingleRoad " + length + " at (" + x + "," + y + ")");
 		this.x = x;
 		this.y = y;
 		road = new Car[length];

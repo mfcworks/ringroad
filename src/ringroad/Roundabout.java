@@ -13,8 +13,8 @@ public class Roundabout implements Intersection {
 	// 交差点番号 i から伸びる道路サイトが接続する交差点を neighbors[i] に格納する。
 	public Intersection[] neighbors;
 
-	public Intersection[] neighbors() {
-		return neighbors;
+	public Intersection neighbor(int isec) {
+		return neighbors[isec];
 	}
 	// 交差点サイトのデータ
 	// XXX: 暫定的に、交差点サイトは1車線としておく。

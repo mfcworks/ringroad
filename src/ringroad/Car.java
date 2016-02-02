@@ -90,8 +90,8 @@ public class Car {
 	 * 配列変数 route に格納します。
 	 */
 	private void setRoute() {
-		int numX = field.intersections.length;
-		int numY = field.intersections[0].length;
+		int numX = field.numX;
+		int numY = field.numY;
 
 		// とりあえずroute変数は最大数+少し余裕を持って確保しておく。
 		route = new int[numX/2 + numY*2 + 2][3];
@@ -114,7 +114,7 @@ public class Car {
 			origX = origin[X];
 			origY = origin[Y];
 		} else {
-			Intersection temp = field.intersections[origin[X]][origin[Y]].neighbors()[origin[ISEC]];
+			Intersection temp = field.intersections[origin[X]][origin[Y]].neighbor(origin[ISEC]);
 			origX = temp.x();
 			origY = temp.y();
 		}
@@ -160,7 +160,7 @@ public class Car {
 
 		// 外回りor内回りを決める  (1=外回り=外側指向, 0=内回り=内側指向)
 		int dir;
-		if (2*Math.PI*ring/numX <= 2/*[rad]*/) {
+		if (2*Math.PI*Math.abs(ring)/numX <= 2/*[rad]*/) {
 			dir = 1; // 2rad未満のとき、外回り
 		} else {
 			dir = 0; // 2rad以上のとき、内回り
