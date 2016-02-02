@@ -74,11 +74,16 @@ public class Roundabout implements Intersection {
 		neighbors[3] = is3;
 	}
 
+	/**
+	 * 交差点を含んでサイト数を返す。
+	 * 例えば dY = 5 ならば、交差点サイトを1含むので6が返る。
+	 * roadがnullなら1が返る。
+	 */
 	public int lengthAt(int isec) {
 		if (roads[isec] == null) {
-			return 0;
+			return 1;
 		} else {
-			return roads[isec].length();
+			return roads[isec].length() + 1;
 		}
 	}
 

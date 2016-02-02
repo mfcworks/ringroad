@@ -60,6 +60,8 @@ public class FieldView extends JPanel {
 
 		g.setColor(Color.BLACK);
 
+		drawThis(g);
+/*
 		// 描画パネルの中心座標
 		int cx = getWidth() / 2;
 		int cy = getHeight() / 2;
@@ -108,52 +110,99 @@ public class FieldView extends JPanel {
 				}
 			}
 		}
+*/
 	}
 
 
-	int[] calcPosition(int x, int y, int isec, int step) {
-		double theta;
+	void drawThis(Graphics g) {
 
+		Color[] colorSet = new Color[] {Color.RED, Color.BLUE, Color.MAGENTA, Color.DARK_GRAY};
+
+		for (int x = 0; x < field.numX; x++) {
+			for (int y = 0; y < field.numY; y++) {
+				for (int isec = 0; isec < 4; isec++) {
+					int stepMax = field.intersections[x][y].lengthAt(isec);
+					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
+					for (int step = 0; step < stepMax; step++) {
+						int[] pos = calcPosition(x, y, isec, step);
+						if (true ) {
+							g.setColor(colorSet[isec]);
+							fillPoint(g, pos[0], pos[1]);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	int[] calcPosition(int x, int y, int isec, int step) {
+		// 交差点位置yの高度での環状道路の1区間のサイト数
 		int dx = (int) Math.round((field.rc + (field.dY * y)) * 2 * Math.PI / field.numX);
+		// 同環状道路の全周のサイト数(ラウンドアバウトのサイト含む)
 		int nAll = (dx + 2) * field.numX;
 
 		// 最小半径
-		double rmin = R * nAll / Math.PI;
-		int n=0;
-		if (isec == 0) { // 環状道路
+		int dxMin = (int) Math.round(field.rc * 2 * Math.PI / field.numX);
+		int nMin = (dxMin + 2) * field.numX;
+		double rmin = R * nMin / Math.PI;
+
+		int n = 0;
+		switch (isec) {
+		case 0:
 			n = (field.dY + 2) * y + 1;
-		} else if (isec == 2) { // 環状道路
+			break;
+		case 2:
 			n = (field.dY + 2) * y;
-		} else if (isec == 1) { // 放射道路上り側
+			break;
+		case 1:
 			n = (field.dY + 2) * y - step;
-		} else /* if (isec == 3) */ { // 放射道路下り側
+			break;
+		case 3:
 			n = (field.dY + 2) * y + 1 + step;
+			break;
 		}
-
-		if (isec == 0 || isec == 2) {
-			int m;
-			if (isec == 0)
-				m = (dx + 2) * x - step;
-			else
-				m = (dx + 2) * x + step + 1;
-			theta = 2*Math.PI*m/nAll;
-		} else {
-			theta = 2*Math.PI*x/field.numX;
-		}
-
 		// 半径
 		double rad = rmin + 2 * R * n;
 
+		// 偏角
+		double theta = 0;
+		int m = 0; // assert 0 <= m < nAll
+		switch (isec) {
+		case 0: // 環状道路外側
+			m = (dx + 2) * x - step;
+			if (m < 0) m += nAll;
+			theta = 2 * Math.PI * m / nAll - Math.atan2(R, rad);
+			break;
+		case 2: // 環状道路内側
+			m = (dx + 2) * x + step + 1;
+			if (m >= nAll) m -= nAll;
+			theta = 2 * Math.PI * m / nAll - Math.atan2(R, rad);
+			break;
+		case 1: // 放射道路上り側
+			//m = (dxMin + 2) * x;
+			theta = 2 * Math.PI * x / field.numX - Math.atan2(R, rad);
+			break;
+		case 3: // 放射道路下り側
+			//m = (dxMin + 2) * x;
+			// FIXME: 微妙に位置がずれているのをいつか直す
+			theta = 2 * Math.PI * x / field.numX + Math.atan2(R, rad);
+			break;
+		}
 
-		int px = 0;
-		int py = 0;
-		return new int[] {px, py};
+
+		// 描画パネルの中心座標
+		int cx = getWidth() / 2;
+		int cy = getHeight() / 2;
+
+		int px = (int) Math.round(rad * Math.cos(theta));
+		int py = (int) Math.round(rad * Math.sin(theta));
+		return new int[] {cx + px, cy - py};
 	}
 
 
 
-
-	double R = 2.5; // ボールサイズ(半径)
+	// 上質なグラフィックスを得るには最低2.0以上にする。
+	double R = 3; // ボールサイズ(半径)
 
 	// 円を塗りつぶす：中心x、中心y、半径r
 	void fillCircle(Graphics g, double x, double y, double r) {
@@ -241,7 +290,7 @@ public class FieldView extends JPanel {
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(500, 500);
-		Field field = new Field(8, 8, 3, 8);
+		Field field = new Field(10, 10, 4, 5);
 		view.draw(field);
 	}
 }
