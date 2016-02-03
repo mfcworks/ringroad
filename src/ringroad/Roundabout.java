@@ -13,6 +13,8 @@ public class Roundabout extends Intersection {
 	// 道路サイトの配列
 	private Road[] roads;
 
+
+
 	// 隣接する交差点の配列
 	// 交差点番号 i から伸びる道路サイトが接続する交差点を neighbors[i] に格納する。
 	public Intersection[] neighbors;
@@ -58,11 +60,7 @@ public class Roundabout extends Intersection {
 	 * @param is3 この交差点の交差点番号3から伸びる道路サイトの先に接続する交差点
 	 */
 	public void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3) {
-		neighbors = new Intersection[4];
-		neighbors[0] = is0;
-		neighbors[1] = is1;
-		neighbors[2] = is2;
-		neighbors[3] = is3;
+		neighbors = new Intersection[] {is0, is1, is2, is3}; // 順番通りに格納
 	}
 
 	/**
@@ -135,6 +133,7 @@ public class Roundabout extends Intersection {
 				roundabout[i] = roundabout[i - 1];
 			}
 			roundabout[0] = temp;
+			System.out.println("特殊パターンです");
 			return 4;
 		} else {
 			// 交差点サイトのどこかに空きがあるか、いずれかの車がスタックしている場合、
@@ -146,7 +145,6 @@ public class Roundabout extends Intersection {
 					roundabout[next] = roundabout[i];
 					roundabout[next].move(thisX, thisY, next, 0);
 					roundabout[i] = null;
-					System.out.println("交差点を回った");
 					moved++;
 				}
 			}
@@ -159,7 +157,10 @@ public class Roundabout extends Intersection {
 	 * 指定された交差点番号における道路の出口から車を移動させる
 	 */
 	public Car[] moveFromRoad(int isec, int n) {
-		return roads[isec].moveFromRoad(n);
+		if (roads[isec] == null)
+			return new Car[0];
+		else
+			return roads[isec].moveFromRoad(n);
 	}
 
 	/* 道路サイトからこの交差点サイトへ入る車をアップデートする。
@@ -169,12 +170,15 @@ public class Roundabout extends Intersection {
 	 */
 	public int updateEnter() {
 		int moved = 0;
-		// 交差点番号 i に接続されているのはneighbors[i]の交差点番号(i+2)%4。
+		// 交差点番号 i に接続されているのはneighbors[i]の交差点番号(i+1)%4。←ここがおかしかった。(i+2)%4は間違い
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] == null) {
-				Car[] cars = neighbors[i].moveFromRoad((i+2) % 4, 1);
+			int next = (i + 1) % 4;
+			int prev = (i + 3) % 4;
+			if (roundabout[i] == null && neighbors[prev] != null) {
+				Car[] cars = neighbors[prev].moveFromRoad(next, 1);
 				if (cars.length == 1) {
 					roundabout[i] = cars[0];
+					roundabout[i].move(thisX, thisY, i, 0);
 					moved++;
 				}
 			}

@@ -5,6 +5,8 @@ import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  * 放射環状道路の可視化クラス
@@ -15,9 +17,13 @@ public class FieldView extends JPanel {
 	private JFrame frame;
 	private Field field;
 
+	private JFrame textFrame;
+
 	private Car car;
 
 	private int drawMode;
+	private JScrollPane scroll;
+	public JTextArea textArea;
 
 	public FieldView(int width, int height) {
 		// メインウィンドウを作成
@@ -36,6 +42,16 @@ public class FieldView extends JPanel {
 
 		// ウィンドウを表示
 		frame.setVisible(true);
+
+		// for DEBUG
+		textFrame = new JFrame("Debug Window");
+		textArea = new JTextArea();
+		scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		textFrame.add(scroll);
+		textArea.setEditable(false);
+		textArea.setText("test");
+		textFrame.setSize(400, 300);
+		textFrame.setVisible(true);
 	}
 
 	/**
@@ -86,10 +102,12 @@ public class FieldView extends JPanel {
 					for (int step = 0; step < stepMax; step++) {
 						int[] pos = calcPosition(x, y, isec, step);
 						int num = field.getIntersection(x, y).numCarsByPosition(isec, step);
-						if (num == 0)
+
+						if (num == 1) {
+							g.setColor(Color.BLUE);
+						} else {
 							g.setColor(Color.WHITE);
-						else
-							g.setColor(Color.RED);
+						}
 
 						fillPoint(g, pos[0], pos[1]);
 					}
@@ -166,7 +184,7 @@ public class FieldView extends JPanel {
 
 	// 上質なグラフィックスを得るには最低2.0以上にする。
 	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
-	double R = 3; // ボールサイズ(半径)
+	double R = 3.0; // ボールサイズ(半径)
 
 	// 円を塗りつぶす：中心x、中心y、半径r
 	void fillCircle(Graphics g, double x, double y, double r) {
@@ -283,23 +301,21 @@ public class FieldView extends JPanel {
 		FieldView view;
 		view = new FieldView(600, 600);
 		Field field = new Field(10, 10, 5, 5);
-		field.initialize(50);
+		field.initialize(100);
 		view.draw(field);
 
 
 		while (true) {
 			field.update();
 			view.draw(field);
-
+			view.textArea.setText(Car.carInfoAll());
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			}
 		}
-		//Car car0 = Car.carList.get(0);
-		//view.drawCarRoute(car0);
 
 
 	}

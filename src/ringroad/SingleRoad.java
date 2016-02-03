@@ -29,7 +29,7 @@ public class SingleRoad extends Road {
 	 */
 	public SingleRoad(int thisX, int thisY, int thisIsec, int length) {
 		super(thisX, thisY, thisIsec, length);
-//		System.out.println("SingleRoad " + length + " at (" + x + "," + y + ")");
+//		System.out.println("SingleRoad " + length + " at (" + thisX + "," + thisX + "," + thisIsec +")");
 		road = new Car[length];
 	}
 
@@ -45,17 +45,22 @@ public class SingleRoad extends Road {
 	}
 
 
+	// この回で動いて末尾に到達したか
+	private boolean lastMoved;
+
 	/**
 	 * 内部サイトのアップデート
 	 */
 	public int updateInternal() {
 		int moved = 0; // 動いた台数
 
+		lastMoved = false;
 		for (int i = 0; i < road.length - 1; i++) {
 			if (road[i] != null && road[i+1] == null) {
 				road[i+1] = road[i];
 				road[i+1].move(thisX, thisY, thisIsec, i+2); //stepはroadのインデックスより1大きいため
 				road[i] = null;
+				if (i == road.length-2) lastMoved = true;
 				i++;
 				moved++;
 			}
@@ -84,12 +89,12 @@ public class SingleRoad extends Road {
 	 * (SingleRoadの場合は最大1台)
 	 */
 	public Car[] moveFromRoad(int n) {
-		int cap = (road[road.length-1] == null ? 0 : 1);
+		int cap = (road[length-1] == null || lastMoved ? 0 : 1);
 		int num = Math.min(cap, n); //移動する台数
 		Car[] cars = new Car[num];
 		if (num == 1) {
-			cars[0] = road[road.length-1];
-			road[road.length-1] = null;
+			cars[0] = road[length-1];
+			road[length-1] = null;
 		}
 		return cars;
 	}

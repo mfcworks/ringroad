@@ -162,6 +162,13 @@ public class Field {
 				moved += intersections[x][y].updateIntersection();
 			}
 		}
+		// Phase 4: update enter
+		for (int x = 0; x < numX; x++) {
+			for (int y = 0; y < numY; y++) {
+				moved += intersections[x][y].updateEnter();
+			}
+		}
+
 		return -1;
 	}
 

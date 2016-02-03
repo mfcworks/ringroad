@@ -49,11 +49,6 @@ public abstract class Road {
 	public abstract int updateInternal();
 
 	/*
-	 * 目的地についた車を消滅させるメソッド
-	 */
-	public abstract int despawn();
-
-	/*
 	 * 車を発生させることを試みる。
 	 * @param step 道路サイトのステップ番号: step > 0
 	 *             (∵ step == 0 は交差点サイトのため。)

@@ -166,7 +166,7 @@ public class Car {
 			ring = 0;
 		} else if (origX < destX) {
 			int t = destX - origX;
-			ring = (t <= numX/2 ? t : numX-t);
+			ring = (t <= numX/2 ? t : t-numX); /*ここが逆っぽい？*/
 		} else /* @when (origX > destX) */ {
 			int t = origX - destX;
 			ring = (t <= numX/2 ? -t : numX-t);
@@ -238,6 +238,10 @@ public class Car {
 			route[idx][Y] = route[idx-1][Y] + 1;
 		}
 
+		if (route[idx][X] != destination[X] || route[idx][Y] != destination[Y])
+			throw new RuntimeException("ルート生成に失敗しました：" + route[idx][X]
+					+ "!=" + destination[X] + " or " + route[idx][Y] + "!=" + destination[Y]);
+
 		// 最後の交差点を抜ける方向
 		route[idx][ISEC] = destination[ISEC];
 
@@ -254,8 +258,10 @@ public class Car {
 			// 交差点を抜けたとき
 			routeStep++;
 
+		} else if (current[STEP] != 0 && newStep == 0) {
+			// 交差点に入ったとき
 			if ((route[routeStep][X] != -1 && route[routeStep][X] != newX) ||
-				(route[routeStep][Y] != -1 && route[routeStep][Y] != newX)) {
+				(route[routeStep][Y] != -1 && route[routeStep][Y] != newY)) {
 				throw new RuntimeException("車が経路通りの道順を進んでいません！");
 			}
 		}
@@ -296,10 +302,25 @@ public class Car {
 			return false;
 	}
 
+	public String carInfo() {
+		return "routeStep = " + routeStep;
+	}
+
+	public static String carInfoAll() {
+		String br = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < carList.size(); i++) {
+			sb.append(carList.get(i).carInfo());
+			sb.append(br);
+		}
+		return sb.toString();
+	}
+
 	/**
 	 * 車を消滅させる直前に呼び出します。
 	 */
 	public void despawning() {
 		System.out.println("車が消滅します");
+		carList.remove(this);
 	}
 }

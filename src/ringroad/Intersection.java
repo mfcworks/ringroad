@@ -42,6 +42,8 @@ public abstract class Intersection {
 
 	public abstract int updateIntersection();
 
+	public abstract int updateEnter();
+
 	// 車の発生を試みる
 	public abstract boolean trySpawn(int isec, int step);
 
