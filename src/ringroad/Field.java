@@ -10,10 +10,11 @@ public class Field {
 
 	// 交差点の2次元配列
 	public Intersection[][] intersections;
-	public int rc;
-	public int numX;
-	public int numY;
-	public int dY;
+
+	public int rc;		// 中心半径
+	public int numX;	// 放射道路の本数
+	public int numY;	// 環状道路の本数
+	public int dY;		// 環状道路の1区間の長さ
 
 	/**
 	 * コンストラクタ
@@ -96,7 +97,27 @@ public class Field {
 	 * 系を1ステップ更新する。
 	 */
 	public int update() {
-		// TODO: 未実装
+		// 車が目的地に到着しているか調べて消滅させる
+
+		int moved = 0;
+		// Phase 1: 全ての交差点について内部アップデートを行なう
+		for (int x = 0; x < numX; x++) {
+			for (int y = 0; y < numY; y++) {
+				moved += intersections[x][y].updateRoadSites();
+			}
+		}
+		// Phase 2: 全ての交差点について、交差点から道路サイトへ抜ける車を移動させる
+		for (int x = 0; x < numX; x++) {
+			for (int y = 0; y <numY; y++) {
+				moved += intersections[x][y].updateExit();
+			}
+		}
+		// Phase 3: 全ての交差点について、交差点を回る全ての車を移動させる
+		for (int x = 0; x < numX; x++) {
+			for (int y = 0; y < numY; y++) {
+				moved += intersections[x][y].update();
+			}
+		}
 		return -1;
 	}
 

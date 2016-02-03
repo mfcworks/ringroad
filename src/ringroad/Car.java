@@ -1,10 +1,14 @@
 package ringroad;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class Car {
 
 	public static Field field;
+
+	public static List<Car> carList = new LinkedList<Car>();
 
 	private int[] origin;
 	private int[] destination;
@@ -21,7 +25,7 @@ public class Car {
 	public int curStep; // 道路サイト中での位置
 
 	// 経路情報
-	private int[][] route;
+	public int[][] route;
 	private int routeStep;
 
 	/**
@@ -50,6 +54,9 @@ public class Car {
 		// 経路を決定する
 		setRoute();
 		routeStep = 0;
+
+		// リストに追加
+		carList.add(this);
 
 		// DEBUG
 		System.out.println("  destination: {" + destination[0] + "," + destination[1] + "," + destination[2] + "," + destination[3] + "}");
@@ -172,7 +179,7 @@ public class Car {
 			inbound = origY;
 		} else if (origY > destY) {
 			// 外回りで目的地のほうが内側にある場合
-			inbound = destY - origY;
+			inbound = origY - destY; /* 逆になってたっぽかった */
 		} else {
 			inbound = 0;
 		}
@@ -234,11 +241,22 @@ public class Car {
 		route[idx][2] = -1;
 	}
 
+	// 車を１サイト動かしたときに呼び出す。
+	public void move(int newX, int newY, int newIsec, int newStep) {
+		curPosX = newX;
+		curPosY = newY;
+		curIsec = newIsec;
+		curStep = newStep;
+	}
 
+	// 交差点から抜けたときに呼び出す。
+	public void nextStep() {
+		routeStep++;
+	}
 
 	// 次の交差点で抜ける交差点番号を返す
 	public int outIsec() {
-		return 0;//XXX
+		return route[routeStep][ISEC];
 	}
 
 
@@ -249,5 +267,18 @@ public class Car {
 			System.out.print("(" + route[i][0] + "," + route[i][1] + ")");
 		}
 		System.out.println();
+	}
+
+	/**
+	 * この車が消滅するか？
+	 */
+	public boolean tryDespawn() {
+		if (curPosX == destination[X] &&
+			curPosY == destination[Y] &&
+			curIsec == destination[ISEC] &&
+			curStep == destination[STEP])
+			return true;
+		else
+			return false;
 	}
 }

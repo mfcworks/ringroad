@@ -15,6 +15,10 @@ public class FieldView extends JPanel {
 	private JFrame frame;
 	private Field field;
 
+	private Car car;
+
+	private int drawMode;
+
 	public FieldView(int width, int height) {
 		// メインウィンドウを作成
 		frame = new JFrame("Ringroad Simulator");
@@ -41,6 +45,7 @@ public class FieldView extends JPanel {
 	 */
 	public void draw(Field field) {
 		this.field = field;
+		drawMode = 0;
 		repaint();
 	}
 
@@ -49,68 +54,23 @@ public class FieldView extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		if (field == null) return;
+		if (drawMode == 0) {
+			if (field == null) return;
 
-		// 描画の開始
-		//
+			// 描画の開始
+			//
 
-		// 背景初期化
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, getWidth(), getHeight());
+			// 背景初期化
+			g.setColor(Color.CYAN);
+			g.fillRect(0, 0, getWidth(), getHeight());
 
-		g.setColor(Color.BLACK);
+			g.setColor(Color.BLACK);
 
-		drawThis(g);
-/*
-		// 描画パネルの中心座標
-		int cx = getWidth() / 2;
-		int cy = getHeight() / 2;
+			drawThis(g);
 
-
-		for (int numy = 0; numy < field.numY; numy++) {
-
-			int dx = (int) Math.round((field.rc + (field.dY * numy)) * 2 * Math.PI / field.numX);
-			int n = (dx + 2) * field.numX; // ラウンドアバウトの場合を仮定
-
-			double radius = R * n / Math.PI; // 必要半径
-
-			// 環状道路の内側車線を描画
-			for (int i = 0; i < n; i++) {
-				if (i <= 2) g.setColor(Color.RED); else g.setColor(Color.BLACK);
-				double x = (cx + radius * Math.cos(2*Math.PI*i/n - Math.PI/n));
-				double y = (cy - radius * Math.sin(2*Math.PI*i/n - Math.PI/n));
-				fillPoint(g, (int) x, (int) y);
-			}
-			radius += 2*R;
-			// 環状道路の外側車線を描画
-			for (int i = 0; i < n; i++) {
-				double x = (cx + radius * Math.cos(2*Math.PI*i/n - Math.PI/n));
-				double y = (cy - radius * Math.sin(2*Math.PI*i/n - Math.PI/n));
-				fillPoint(g, (int) x, (int) y);
-			}
-
-			// 放射道路を描画
-			if (numy == field.numY - 1) break;
-
-			double rad = radius + 2*R;
-			for (int numx = 0; numx < field.numX; numx++) {
-
-				for (int dy = 0; dy < field.dY - 3; dy++) {
-					double x = cx + (rad + dy*2*R) * Math.cos(2*Math.PI*numx/field.numX);
-					double y = cy + (rad + dy*2*R) * Math.sin(2*Math.PI*numx/field.numX);
-
-					double rx = R * Math.sin(2*Math.PI*numx/field.numX);
-					double ry = R * Math.cos(2*Math.PI*numx/field.numX);
-
-					// どっちもどっちか？
-					fillPoint(g, (int) (x-rx), (int) (y+ry));
-					fillPoint(g, (int) (x+rx), (int) (y-ry));
-			//		fillPoint(g, (int) Math.round(x-rx), (int) Math.round(y+ry));
-			//		fillPoint(g, (int) Math.round(x+rx), (int) Math.round(y-ry));
-				}
-			}
+		} else if (drawMode == 1) {
+			drawCarRoute(g);
 		}
-*/
 	}
 
 
@@ -122,13 +82,16 @@ public class FieldView extends JPanel {
 			for (int y = 0; y < field.numY; y++) {
 				for (int isec = 0; isec < 4; isec++) {
 					int stepMax = field.intersections[x][y].lengthAt(isec);
-					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
+//					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
 					for (int step = 0; step < stepMax; step++) {
 						int[] pos = calcPosition(x, y, isec, step);
-						if (true ) {
-							g.setColor(colorSet[isec]);
-							fillPoint(g, pos[0], pos[1]);
-						}
+						int num = field.intersections[x][y].numCarsByPosition(isec, step);
+						if (num == 0)
+							g.setColor(Color.WHITE);
+						else
+							g.setColor(Color.RED);
+
+						fillPoint(g, pos[0], pos[1]);
 					}
 				}
 			}
@@ -202,6 +165,7 @@ public class FieldView extends JPanel {
 
 
 	// 上質なグラフィックスを得るには最低2.0以上にする。
+	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
 	double R = 3; // ボールサイズ(半径)
 
 	// 円を塗りつぶす：中心x、中心y、半径r
@@ -212,12 +176,21 @@ public class FieldView extends JPanel {
 		g.fillOval(xx, yy, rr, rr);
 	}
 
-	void fillPoint(Graphics g, int x, int y) {
+	void fillDot(Graphics g, int x, int y) {
 		g.fillRect(x, y, 1, 1);
 		g.fillRect(x, y-1, 1, 1);
 		g.fillRect(x, y+1, 1, 1);
 		g.fillRect(x-1, y, 1, 1);
 		g.fillRect(x+1, y, 1, 1);
+	}
+
+	// プロット点（大きさによって切り替え）
+	void fillPoint(Graphics g, int x, int y) {
+		if (R < 2) {
+			fillDot(g, x, y);
+		} else {
+			fillCircle(g, x, y, R*0.8);
+		}
 	}
 
 	public void test(Graphics g, int numX, int numY, int rc) {
@@ -285,12 +258,49 @@ public class FieldView extends JPanel {
 
 	}
 
+	public void drawCarRoute(Car car) {
+		this.car = car;
+		drawMode = 1;
+		repaint();
+	}
+
+	// グラフィックスが上書きできない問題
+	public void drawCarRoute(Graphics g) {
+		int[][] route = car.route;
+		int i = 0;
+		g.setColor(Color.BLUE);
+		while (true) {
+			if (route[i][0] == -1) break;
+			int[] pos = calcPosition(route[i][0], route[i][1], route[i][2], 0);
+			fillPoint(g, pos[0], pos[1]);
+			i++;
+		}
+	}
+
 
 	// test
 	public static void main(String[] args) {
 		FieldView view;
-		view = new FieldView(500, 500);
-		Field field = new Field(10, 10, 4, 5);
+		view = new FieldView(600, 600);
+		Field field = new Field(10, 10, 5, 5);
+		field.initialize(50);
 		view.draw(field);
+
+
+		while (true) {
+			field.update();
+			view.draw(field);
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+		}
+		//Car car0 = Car.carList.get(0);
+		//view.drawCarRoute(car0);
+
+
 	}
 }

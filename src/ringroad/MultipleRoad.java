@@ -9,7 +9,7 @@ package ringroad;
  * ├┼┼┼┼┼┼┼┼┼┼┤
  * └┴┴┴┴┴┴┴┴┴┴┘
  */
-public class MultipleRoad implements Road {
+public class MultipleRoad extends Road {
 
 	/*
 	 * 道路サイトはQueue<Car>の配列として表す。
@@ -29,9 +29,8 @@ public class MultipleRoad implements Road {
 	 * @param length 道路長
 	 * @param n      車線数
 	 */
-	public MultipleRoad(int x, int y, int length, int n) {
-		this.x = x;
-		this.y = y;
+	public MultipleRoad(int thisX, int thisY, int thisIsec, int length, int n) {
+		super(thisX, thisY, thisIsec, length);
 
 		roadSites = new RoadSite[length];
 		for (int i = 0; i < length; i++) {

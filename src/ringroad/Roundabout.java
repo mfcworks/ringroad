@@ -4,7 +4,7 @@ package ringroad;
  * ラウンドアバウト交差点を持つ交差点
  *
  */
-public class Roundabout implements Intersection {
+public class Roundabout extends Intersection {
 
 	// 道路サイトの配列
 	private Road[] roads;
@@ -20,17 +20,7 @@ public class Roundabout implements Intersection {
 	// XXX: 暫定的に、交差点サイトは1車線としておく。
 	private Car[] roundabout;
 
-	// この交差点の位置情報
-	private int x;
-	private int y;
 
-	public int x() {
-		return x;
-	}
-
-	public int y() {
-		return y;
-	}
 
 	public int numCarsByPosition(int isec, int step) {
 		if (step == 0)
@@ -42,19 +32,19 @@ public class Roundabout implements Intersection {
 	/**
 	 * コンストラクタ
 	 *
-	 * @param x, y : この交差点の位置情報
+	 * @param thisX, thisY : この交差点の座標(X, Y)
 	 * @param len0, len1, len2, len3 : 各交差点番号に接続する道路の長さ
 	 * @param n0, n1, n2, n3 : 各交差点番号に接続する道路の車線数
 	 */
-	public Roundabout(int x, int y, int len0, int len1, int len2, int len3, int n0, int n1, int n2, int n3) {
-		this.x = x;
-		this.y = y;
+	public Roundabout(int thisX, int thisY, int len0, int len1, int len2, int len3, int n0, int n1, int n2, int n3) {
+		super(thisX, thisY);
+
 		// 道路サイトのオブジェクトを生成
 		roads = new Road[4];
-		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(x, y, len0) : new MultipleRoad(x, y, len0, n0)));
-		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(x, y, len1) : new MultipleRoad(x, y, len1, n1)));
-		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(x, y, len2) : new MultipleRoad(x, y, len2, n2)));
-		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(x, y, len3) : new MultipleRoad(x, y, len3, n3)));
+		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(thisX, thisY, 0, len0) : new MultipleRoad(thisX, thisY, 0, len0, n0)));
+		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(thisX, thisY, 1, len1) : new MultipleRoad(thisX, thisY, 1, len1, n1)));
+		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(thisX, thisY, 2, len2) : new MultipleRoad(thisX, thisY, 2, len2, n2)));
+		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(thisX, thisY, 3, len3) : new MultipleRoad(thisX, thisY, 3, len3, n3)));
 		// この交差点のサイト
 		roundabout = new Car[4];
 	}
@@ -83,7 +73,7 @@ public class Roundabout implements Intersection {
 		if (roads[isec] == null) {
 			return 1;
 		} else {
-			return roads[isec].length() + 1;
+			return roads[isec].length + 1;
 		}
 	}
 
@@ -95,7 +85,8 @@ public class Roundabout implements Intersection {
 	public int updateRoadSites() {
 		int moved = 0;
 		for (int i = 0; i < 4; i++) {
-			moved += roads[i].updateInternal();
+			if (roads[i] != null)
+				moved += roads[i].updateInternal();
 		}
 		return moved;
 	}
@@ -106,10 +97,14 @@ public class Roundabout implements Intersection {
 
 		for (int i = 0; i < 4; i++) {
 			if (roundabout[i] != null) {
+				if (roundabout[i].curPosX != thisX || roundabout[i].curPosY != thisY) {
+					throw new RuntimeException("assertion error.");
+				}
 				if (roundabout[i].outIsec() == i) {
 					if (roads[i].tryMoveToRoad(roundabout[i])) {
 						roundabout[i] = null;
 						moved++;
+						System.out.println("交差点から道路サイトへ抜けた");
 					}
 				}
 			}
@@ -156,6 +151,7 @@ public class Roundabout implements Intersection {
 				if (roundabout[i] != null && roundabout[i].outIsec() != i && roundabout[next] == null) {
 					roundabout[next] = roundabout[i];
 					roundabout[i] = null;
+					System.out.println("交差点を回った");
 					moved++;
 				}
 			}
@@ -197,13 +193,16 @@ public class Roundabout implements Intersection {
 	 */
 	public boolean trySpawn(int isec, int step) {
 		if (step == 0) {
+			// この交差点の交差点サイトに発生を試みる場合、
+			// そこに既に車がいなければ発生させる。
 			if (roundabout[isec] == null) {
-				roundabout[isec] = new Car(x, y, isec, 0);
+				roundabout[isec] = new Car(thisX, thisY, isec, 0);
 				return true;
 			} else {
 				return false;
 			}
 		} else {
+			// 道路サイトに発生させる場合、道路サイトのメソッドへ投げる
 			return roads[isec].trySpawn(step);
 		}
 	}

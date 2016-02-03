@@ -4,14 +4,9 @@ package ringroad;
  * 一車線道路
  *
  */
-public class SingleRoad implements Road {
+public class SingleRoad extends Road {
 
-	/*
-	 * この道路の位置情報
-	 */
-	private int x;
-	private int y;
-	private int isec;
+
 
 	/*
 	 * 道路サイトはCarの配列として表す。
@@ -19,29 +14,26 @@ public class SingleRoad implements Road {
 	 * 進行方向にインデックスが増大する。
 	 *
 	 * 道路長は road.length で取得する。
+	 * road[0]がstep=1に対応する。
 	 */
 	public Car[] road;
 
+
 	/**
-	 * コンストラクタ
+	 * コンストラクタ。道路サイトを作成する
 	 *
-	 * @param x この道路を持つ交差点のX座標
-	 * @param y この道路を持つ交差点のY座標
-	 * @param length 道路長
+	 * @param thisX    この道路がある交差点のX座標
+	 * @param thisY    この道路がある交差点のY座標
+	 * @param thisIsec この道路の交差点番号
+	 * @param length   この道路の長さ（交差点サイトを除いたサイト数）
 	 */
-	public SingleRoad(int x, int y, int length) {
+	public SingleRoad(int thisX, int thisY, int thisIsec, int length) {
+		super(thisX, thisY, thisIsec, length);
 //		System.out.println("SingleRoad " + length + " at (" + x + "," + y + ")");
-		this.x = x;
-		this.y = y;
 		road = new Car[length];
 	}
 
-	/**
-	 * 道路長を取得します。
-	 */
-	public int length() {
-		return road.length;
-	}
+
 
 	// 道路の入り口に何台入れるか
 	public int spaceEnter() {
@@ -49,7 +41,7 @@ public class SingleRoad implements Road {
 	}
 
 	public int carsAt(int step) {
-		return (road[step] == null ? 0 : 1);
+		return (road[step - 1] == null ? 0 : 1);
 	}
 
 
@@ -62,6 +54,7 @@ public class SingleRoad implements Road {
 		for (int i = 0; i < road.length - 1; i++) {
 			if (road[i] != null && road[i+1] == null) {
 				road[i+1] = road[i];
+				road[i+1].move(thisX, thisY, thisIsec, i+2); //stepはroadのインデックスより1大きいため
 				road[i] = null;
 				i++;
 				moved++;
@@ -77,6 +70,8 @@ public class SingleRoad implements Road {
 	public boolean tryMoveToRoad(Car car) {
 		if (road[0] == null) {
 			road[0] = car;
+			// ここでcarのステップを進める。
+			road[0].nextStep();
 			return true;
 		} else {
 			return false;
@@ -107,7 +102,7 @@ public class SingleRoad implements Road {
 	 */
 	public boolean trySpawn(int step) {
 		if (road[step - 1] == null) {
-			road[step - 1] = new Car(x, y, isec, step);
+			road[step - 1] = new Car(thisX, thisY, thisIsec, step);
 			return true;
 		} else {
 			return false;
@@ -121,12 +116,8 @@ public class SingleRoad implements Road {
 		int num = 0;
 
 		for (int i = 0; i < road.length; i++) {
-			if (road[i].curPosX == x &&
-				road[i].curPosY == y &&
-				road[i].curIsec == isec &&
-				// XXX: 注意：車の位置は配列のインデックスと 1 だけ異なる！
-				road[i].curStep == i + 1) {
-				// 車を消滅させる
+			if (road[i].tryDespawn()) {
+				System.out.println("車が消滅します");
 				road[i] = null;
 				num++;
 			}
