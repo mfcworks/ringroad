@@ -10,21 +10,33 @@ public class Car {
 
 	public static List<Car> carList = new LinkedList<Car>();
 
+	// int[4] の位置情報の配列のインデックスには次の定数を用いる
+	private static final int X = 0;
+	private static final int Y = 1;
+	private static final int ISEC = 2;
+	private static final int STEP = 3;
+
+
+	/**
+	 * 出発地の位置(x, y, isec, step)
+	 */
 	private int[] origin;
+	/**
+	 * 目的地の位置(x, y, isec, step)
+	 */
 	private int[] destination;
-	//
-	private final int X = 0;
-	private final int Y = 1;
-	private final int ISEC = 2;
-	private final int STEP = 3;
+	/**
+	 * 現在位置(x, y, isec, step)
+	 */
+	private int[] current;
 
-	// この車の現在地情報
-	public int curPosX; // fieldのx座標(円筒系)
-	public int curPosY; // fieldのy座標(円筒系)
-	public int curIsec; // 交差点番号
-	public int curStep; // 道路サイト中での位置
 
-	// 経路情報
+	/**
+	 * 経路情報
+	 * route[i][X]は i番目に通るの交差点のX座標、
+	 * route[i][Y]は i番目に通るの交差点のY座標、
+	 * route[i][ISEC]は i番目に通る交差点を抜ける交差点番号を格納する。
+	 */
 	public int[][] route;
 	private int routeStep;
 
@@ -39,15 +51,13 @@ public class Car {
 	 * @param step 出発地の道路サイトのステップ数
 	 */
 	public Car(int x, int y, int isec, int step) {
+		// 出発地を格納する
 		origin = new int[] {x, y, isec, step};
+		// 出発時は出発地にいる
+		current = new int[] {x, y, isec, step};
 
 		System.out.println("Car is being created:");
 		System.out.println("  origin: {" + origin[0] + "," + origin[1] + "," + origin[2] + "," + origin[3] + "}");
-
-		curPosX = x;
-		curPosY = y;
-		curIsec = isec;
-		curStep = step;
 
 		// 目的地を決定する
 		setDestination();
@@ -69,18 +79,15 @@ public class Car {
 	private void setDestination() {
 		Random random = new Random();
 
-		int nx = field.intersections.length;
-		int ny = field.intersections[0].length;
-
 		boolean flag = true;
 		int rx, ry, ri, rs;
 		do {
-			rx = random.nextInt(nx);
-			ry = random.nextInt(ny);
+			rx = random.nextInt(field.numX);
+			ry = random.nextInt(field.numY);
 			ri = random.nextInt(4);
-			int ni = field.intersections[rx][ry].lengthAt(ri);
-			if (ni == 0) continue;
+			int ni = field.lengthAt(rx, ry, ri) + 1;
 			rs = random.nextInt(ni);
+
 			// 出発地と完全に一致した場合は抽選し直し
 			if (origin[X] == rx &&
 				origin[Y] == ry &&
@@ -109,9 +116,9 @@ public class Car {
 			origin[ISEC] == destination[ISEC] &&
 			origin[STEP] > 0 && origin[STEP] < destination[STEP]) {
 			// routeにダミー値をセットして終了
-			route[0][0] = -1;
-			route[0][1] = -1;
-			route[0][2] = -1;
+			route[0][X] = -1;
+			route[0][Y] = -1;
+			route[0][ISEC] = -1;
 			return;
 		}
 
@@ -121,9 +128,9 @@ public class Car {
 			origX = origin[X];
 			origY = origin[Y];
 		} else {
-			Intersection temp = field.intersections[origin[X]][origin[Y]].neighbor(origin[ISEC]);
-			origX = temp.x();
-			origY = temp.y();
+			Intersection temp = field.getIntersection(origin[X], origin[Y]).neighbor(origin[ISEC]);
+			origX = temp.thisX;
+			origY = temp.thisY;
 		}
 
 		// 目的地に着く前に通る最後の交差点の座標
@@ -179,7 +186,7 @@ public class Car {
 			inbound = origY;
 		} else if (origY > destY) {
 			// 外回りで目的地のほうが内側にある場合
-			inbound = origY - destY; /* 逆になってたっぽかった */
+			inbound = origY - destY;
 		} else {
 			inbound = 0;
 		}
@@ -199,60 +206,67 @@ public class Car {
 		// これ以降、実際に経路をセットしていく
 		int idx = 0;
 		// 出発地を代入
-		route[idx][0] = origX;
-		route[idx][1] = origY;
+		route[idx][X] = origX;
+		route[idx][Y] = origY;
 
 		for (int i = 0; i < inbound; i++) {
 			// 方向
-			route[idx][2] = 1; // 上り方向
+			route[idx][ISEC] = 1; // 上り方向
 			idx++;
 			// その結果たどり着く交差点
-			route[idx][0] = route[idx-1][0];
-			route[idx][1] = route[idx-1][1] - 1;
+			route[idx][X] = route[idx-1][X];
+			route[idx][Y] = route[idx-1][Y] - 1;
 		}
 
 		for (int i = 0; i < Math.abs(ring); i++) {
 			// 方向
-			route[idx][2] = (ring > 0 ? 2 : 0); // 正回りor負回り
+			route[idx][ISEC] = (ring > 0 ? 2 : 0); // 正回りor負回り
 			idx++;
 			// その結果たどり着く交差点
-			route[idx][0] = (ring > 0 ?
-					/*正回り*/ (route[idx-1][0]==field.numX-1 ? 0 : route[idx-1][0]+1) :
-					/*負回り*/ (route[idx-1][0]==0 ? field.numX-1 : route[idx-1][0]-1));
-			route[idx][1] = route[idx-1][1];
+			route[idx][X] = (ring > 0 ?
+					/*正回り*/ (route[idx-1][X]==numX-1 ? 0 : route[idx-1][X]+1) :
+					/*負回り*/ (route[idx-1][X]==0 ? numX-1 : route[idx-1][X]-1));
+			route[idx][Y] = route[idx-1][Y];
 		}
 
 		for (int i = 0; i < outbound; i++) {
 			// 方向
-			route[idx][2] = 3; // 下り方向
+			route[idx][ISEC] = 3; // 下り方向
 			idx++;
 			// その結果たどり着く交差点
-			route[idx][0] = route[idx-1][0];
-			route[idx][1] = route[idx-1][1] + 1;
+			route[idx][X] = route[idx-1][X];
+			route[idx][Y] = route[idx-1][Y] + 1;
 		}
 
 		// 最後の交差点を抜ける方向
-		route[idx][2] = destination[2];
+		route[idx][ISEC] = destination[ISEC];
 
 		// とりあえず最後にダミー値を入れておく。
 		idx++;
-		route[idx][0] = -1;
-		route[idx][1] = -1;
-		route[idx][2] = -1;
+		route[idx][X] = -1;
+		route[idx][Y] = -1;
+		route[idx][ISEC] = -1;
 	}
 
-	// 車を１サイト動かしたときに呼び出す。
+	// 車を1サイト動かしたときに呼び出す。
 	public void move(int newX, int newY, int newIsec, int newStep) {
-		curPosX = newX;
-		curPosY = newY;
-		curIsec = newIsec;
-		curStep = newStep;
+		if (current[STEP] == 0 && newStep != 0) {
+			// 交差点を抜けたとき
+			routeStep++;
+
+			if ((route[routeStep][X] != -1 && route[routeStep][X] != newX) ||
+				(route[routeStep][Y] != -1 && route[routeStep][Y] != newX)) {
+				throw new RuntimeException("車が経路通りの道順を進んでいません！");
+			}
+		}
+
+		current[X]    = newX;
+		current[Y]    = newY;
+		current[ISEC] = newIsec;
+		current[STEP] = newStep;
 	}
 
-	// 交差点から抜けたときに呼び出す。
-	public void nextStep() {
-		routeStep++;
-	}
+
 
 	// 次の交差点で抜ける交差点番号を返す
 	public int outIsec() {
@@ -273,12 +287,19 @@ public class Car {
 	 * この車が消滅するか？
 	 */
 	public boolean tryDespawn() {
-		if (curPosX == destination[X] &&
-			curPosY == destination[Y] &&
-			curIsec == destination[ISEC] &&
-			curStep == destination[STEP])
+		if (current[X]    == destination[X] &&
+			current[Y]    == destination[Y] &&
+			current[ISEC] == destination[ISEC] &&
+			current[STEP] == destination[STEP])
 			return true;
 		else
 			return false;
+	}
+
+	/**
+	 * 車を消滅させる直前に呼び出します。
+	 */
+	public void despawning() {
+		System.out.println("車が消滅します");
 	}
 }

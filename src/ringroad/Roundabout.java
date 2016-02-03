@@ -6,6 +6,10 @@ package ringroad;
  */
 public class Roundabout extends Intersection {
 
+	// 交差点サイトのデータ
+	// XXX: 暫定的に、交差点サイトは1車線としておく。
+	private Car[] roundabout;
+
 	// 道路サイトの配列
 	private Road[] roads;
 
@@ -16,9 +20,6 @@ public class Roundabout extends Intersection {
 	public Intersection neighbor(int isec) {
 		return neighbors[isec];
 	}
-	// 交差点サイトのデータ
-	// XXX: 暫定的に、交差点サイトは1車線としておく。
-	private Car[] roundabout;
 
 
 
@@ -65,15 +66,13 @@ public class Roundabout extends Intersection {
 	}
 
 	/**
-	 * 交差点を含んでサイト数を返す。
-	 * 例えば dY = 5 ならば、交差点サイトを1含むので6が返る。
-	 * roadがnullなら1が返る。
+	 * 交差点を含まないサイト数を返す。
 	 */
 	public int lengthAt(int isec) {
 		if (roads[isec] == null) {
-			return 1;
+			return 0;
 		} else {
-			return roads[isec].length + 1;
+			return roads[isec].length;
 		}
 	}
 
@@ -91,21 +90,15 @@ public class Roundabout extends Intersection {
 		return moved;
 	}
 
-	// 交差点から道路サイトへ抜ける車をアップデートする
+	// 交差点から道路サイトへ抜ける車をアップデートする（自分の交差点内での操作）
 	public int updateExit() {
 		int moved = 0;
 
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] != null) {
-				if (roundabout[i].curPosX != thisX || roundabout[i].curPosY != thisY) {
-					throw new RuntimeException("assertion error.");
-				}
-				if (roundabout[i].outIsec() == i) {
-					if (roads[i].tryMoveToRoad(roundabout[i])) {
-						roundabout[i] = null;
-						moved++;
-						System.out.println("交差点から道路サイトへ抜けた");
-					}
+			if (roundabout[i] != null && roundabout[i].outIsec() == i) {
+				if (roads[i].tryExit(roundabout[i])) {
+					roundabout[i] = null;
+					moved++;
 				}
 			}
 		}
@@ -113,8 +106,9 @@ public class Roundabout extends Intersection {
 		return moved;
 	}
 
+
 	/**
-	 * この交差点の交差点サイトにいる車をアップデートする。
+	 * この交差点の交差点サイト内にいる車をアップデートする。
 	 *
 	 * ルール上、前の段階で交差点から道路へ抜ける車は全て
 	 * 動かしてあるので、この段階で交差点に車がいる場合、
@@ -123,7 +117,7 @@ public class Roundabout extends Intersection {
 	 * ・車が道路に抜けたいが、動けなかった場合 (car.isec == isec)
 	 * 後者は動けないので動かさず、前者を動かす。
 	 */
-	public int update() {
+	public int updateIntersection() {
 		// XXX: とりあえず以下の特殊ルールを適用しておく。
 		boolean flag = true;
 		for (int i = 0; i < 4; i++) {
@@ -150,6 +144,7 @@ public class Roundabout extends Intersection {
 				int next = (i + 1) % 4;
 				if (roundabout[i] != null && roundabout[i].outIsec() != i && roundabout[next] == null) {
 					roundabout[next] = roundabout[i];
+					roundabout[next].move(thisX, thisY, next, 0);
 					roundabout[i] = null;
 					System.out.println("交差点を回った");
 					moved++;
@@ -189,7 +184,7 @@ public class Roundabout extends Intersection {
 
 
 	/**
-	 * 車の発生を試みる
+	 * 車の発生を試みる。
 	 */
 	public boolean trySpawn(int isec, int step) {
 		if (step == 0) {
@@ -205,6 +200,28 @@ public class Roundabout extends Intersection {
 			// 道路サイトに発生させる場合、道路サイトのメソッドへ投げる
 			return roads[isec].trySpawn(step);
 		}
+	}
+
+	/**
+	 * 車の消滅を行なう。
+	 */
+	public int tryDespawn() {
+		int deleted = 0;
+		// 交差点サイト
+		for (int i = 0; i < 4; i++) {
+			if (roundabout[i] != null && roundabout[i].tryDespawn()) {
+				roundabout[i].despawning();
+				roundabout[i] = null;
+				deleted++;
+			}
+		}
+		// 道路サイト
+		for (int i = 0; i < 4; i++) {
+			if (roads[i] != null)
+				deleted += roads[i].tryDespawn();
+		}
+
+		return deleted;
 	}
 
 }

@@ -40,10 +40,13 @@ public abstract class Intersection {
 
 	public abstract void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3);
 
-	public abstract int update();
+	public abstract int updateIntersection();
 
 	// 車の発生を試みる
 	public abstract boolean trySpawn(int isec, int step);
+
+	// 車の消滅を行なう。
+	public abstract int tryDespawn();
 
 	// 指定された交差点番号における道路の出口から車を移動させる
 	public abstract Car[] moveFromRoad(int isec, int n);

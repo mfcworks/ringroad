@@ -81,11 +81,11 @@ public class FieldView extends JPanel {
 		for (int x = 0; x < field.numX; x++) {
 			for (int y = 0; y < field.numY; y++) {
 				for (int isec = 0; isec < 4; isec++) {
-					int stepMax = field.intersections[x][y].lengthAt(isec);
+					int stepMax = field.getIntersection(x, y).lengthAt(isec) + 1;
 //					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
 					for (int step = 0; step < stepMax; step++) {
 						int[] pos = calcPosition(x, y, isec, step);
-						int num = field.intersections[x][y].numCarsByPosition(isec, step);
+						int num = field.getIntersection(x, y).numCarsByPosition(isec, step);
 						if (num == 0)
 							g.setColor(Color.WHITE);
 						else

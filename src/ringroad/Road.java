@@ -64,10 +64,12 @@ public abstract class Road {
 	/*
 	 * 道路サイトの入口に車を1台移動することを試みる
 	 */
-	public abstract boolean tryMoveToRoad(Car car);
+	public abstract boolean tryExit(Car car);
 
 	/*
 	 * 道路サイトの出口から車を移動させる
 	 */
 	public abstract Car[] moveFromRoad(int n);
+
+	public abstract int tryDespawn();
 }

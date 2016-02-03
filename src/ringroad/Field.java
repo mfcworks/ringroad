@@ -8,13 +8,31 @@ import java.util.Random;
  */
 public class Field {
 
-	// 交差点の2次元配列
-	public Intersection[][] intersections;
+	/**
+	 * 交差点の2次元配列
+	 */
+	private Intersection[][] intersections;
 
-	public int rc;		// 中心半径
-	public int numX;	// 放射道路の本数
-	public int numY;	// 環状道路の本数
-	public int dY;		// 環状道路の1区間の長さ
+	/**
+	 * 中心半径
+	 */
+	public final int rc;
+	/**
+	 * 放射道路の本数
+	 */
+	public final int numX;
+	/**
+	 * 環状道路の本数
+	 */
+	public final int numY;
+	/**
+	 * 放射道路の1区間の長さ
+	 */
+	public final int dY;
+	/**
+	 * 環状道路の1区間の長さ
+	 */
+	public final int[] dX;
 
 	/**
 	 * コンストラクタ
@@ -35,6 +53,8 @@ public class Field {
 
 		intersections = new Intersection[numX][numY];
 
+		dX = new int[numY];
+
 		// DEBUG
 		System.out.println("Field initializing...");
 		System.out.println("放射道路の区間長: " + dY);
@@ -48,6 +68,8 @@ public class Field {
 				int n02 = (int) Math.round((rc + (dY * y)) * 2 * Math.PI / numX);
 				int n1 = (y == 0 ? 0 : dY);
 				int n3 = (y == numY-1 ? 0 : dY);
+
+				dX[y] = n02;
 
 				// XXX: とりあえず全て1車線道路。
 				intersections[x][y] = new Roundabout(x, y, n02, n1, n02, n3, 1, 1, 1, 1);
@@ -66,6 +88,22 @@ public class Field {
 						(y == numY-1 ? null : intersections[x][y+1]));
 			}
 		}
+	}
+
+
+	/**
+	 * 位置(x, y)の交差点を取得します。
+	 */
+	public Intersection getIntersection(int x, int y) {
+		return intersections[x][y];
+	}
+
+	/**
+	 * 交差点(x,y)の交差点番号isecの道路サイトの長さを取得する。
+	 * @return 交差点サイトを除いた道路サイトのサイト数
+	 */
+	public int lengthAt(int x, int y, int isec) {
+		return intersections[x][y].lengthAt(isec);
 	}
 
 
@@ -97,7 +135,13 @@ public class Field {
 	 * 系を1ステップ更新する。
 	 */
 	public int update() {
-		// 車が目的地に到着しているか調べて消滅させる
+		int deleted = 0;
+		// Phase 0: 車が目的地に到着しているか調べて消滅させる
+		for (int x = 0; x < numX; x++) {
+			for (int y = 0; y < numY; y++) {
+				deleted += intersections[x][y].tryDespawn();
+			}
+		}
 
 		int moved = 0;
 		// Phase 1: 全ての交差点について内部アップデートを行なう
@@ -115,7 +159,7 @@ public class Field {
 		// Phase 3: 全ての交差点について、交差点を回る全ての車を移動させる
 		for (int x = 0; x < numX; x++) {
 			for (int y = 0; y < numY; y++) {
-				moved += intersections[x][y].update();
+				moved += intersections[x][y].updateIntersection();
 			}
 		}
 		return -1;

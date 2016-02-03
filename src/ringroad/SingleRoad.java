@@ -67,11 +67,11 @@ public class SingleRoad extends Road {
 	/**
 	 * 交差点から道路サイトへの車の移動を試みる
 	 */
-	public boolean tryMoveToRoad(Car car) {
+	public boolean tryExit(Car car) {
 		if (road[0] == null) {
+			// 移動成功
 			road[0] = car;
-			// ここでcarのステップを進める。
-			road[0].nextStep();
+			road[0].move(thisX, thisY, thisIsec, 1);
 			return true;
 		} else {
 			return false;
@@ -98,7 +98,7 @@ public class SingleRoad extends Road {
 
 
 	/**
-	 * 車の発生を試みる
+	 * 車の発生を試みる。
 	 */
 	public boolean trySpawn(int step) {
 		if (road[step - 1] == null) {
@@ -110,19 +110,18 @@ public class SingleRoad extends Road {
 	}
 
 	/**
-	 * 車の消滅
+	 * 車の消滅を行なう。
 	 */
-	public int despawn() {
-		int num = 0;
+	public int tryDespawn() {
+		int deleted = 0;
 
 		for (int i = 0; i < road.length; i++) {
-			if (road[i].tryDespawn()) {
-				System.out.println("車が消滅します");
+			if (road[i] != null && road[i].tryDespawn()) {
+				road[i].despawning();
 				road[i] = null;
-				num++;
+				deleted++;
 			}
 		}
-
-		return num;
+		return deleted;
 	}
 }
