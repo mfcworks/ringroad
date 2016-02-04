@@ -106,13 +106,12 @@ public class Field {
 		return intersections[x][y].lengthAt(isec);
 	}
 
-
 	/**
-	 * 初期状態を設定する。ランダムな位置に車を配置する
+	 * n台の車を発生させる。
 	 *
 	 * @param n 発生させる車の台数
 	 */
-	public void initialize(int n) {
+	public void createCars(int n) {
 		Random random = new Random();
 
 		for (int i = 0; i < n; i++) {
@@ -128,6 +127,15 @@ public class Field {
 				flag = intersections[rx][ry].trySpawn(ri, rs);
 			} while(!flag);
 		}
+	}
+
+	/**
+	 * 初期状態を設定する。ランダムな位置に車を配置する
+	 *
+	 * @param n 発生させる車の台数
+	 */
+	public void initialize(int n) {
+		createCars(n);
 	}
 
 
@@ -177,7 +185,10 @@ public class Field {
 		}
 		lastmoved = moved;
 		if (zeromoved > 5) {
+			if (Car.carList.size() == 0)
+				System.exit(0);
 			throw new RuntimeException();
+
 		}
 
 		return moved;

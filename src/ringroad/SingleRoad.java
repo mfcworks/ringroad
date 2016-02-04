@@ -122,8 +122,9 @@ public class SingleRoad extends Road {
 
 		for (int i = 0; i < road.length; i++) {
 			if (road[i] != null && road[i].isDespawn()) {
-				road[i].despawning();
+				Car carToDel = road[i];
 				road[i] = null;
+				carToDel.despawning();
 				deleted++;
 			}
 		}
@@ -131,6 +132,7 @@ public class SingleRoad extends Road {
 	}
 
 	public int getCarOut(int step) {
+		if (road[step-1]==null) throw new RuntimeException("Something happen");
 		return road[step-1].outIsec();
 	}
 }

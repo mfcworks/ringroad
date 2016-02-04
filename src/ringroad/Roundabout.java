@@ -117,16 +117,18 @@ public class Roundabout extends Intersection {
 	 */
 	public int updateIntersection() {
 		// XXX: とりあえず以下の特殊ルールを適用しておく。
+		// XXX: 2つの交差点と、それらの間の往復車線における全てのサイトに車が詰まるデッドロックが
+		// 発生したため、外に抜けられない交差点内の車はラウンドアバウトを回るルールに変更する。
 		boolean flag = true;
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] == null || roundabout[i].outIsec() == i) {
+			if (roundabout[i] == null /*|| roundabout[i].outIsec() == i*/) {
 				flag = false;
 				break;
 			}
 		}
 
 		if (flag) {
-			// 全ての交差点サイトに車がいて、それぞれが交差点を回る場合、
+			// 全ての交差点サイトに車がいる場合、無条件に（抜けられる場合は前段で抜けているはずなので）
 			// それぞれをヌルっと動かす。
 			Car temp = roundabout[3];
 			for (int i = 3; i > 0; i--) {
@@ -135,7 +137,6 @@ public class Roundabout extends Intersection {
 			}
 			roundabout[0] = temp;
 			roundabout[0].move(thisX, thisY, 0, 0);
-			System.out.println("特殊パターンです");
 			return 4;
 		} else {
 			// 交差点サイトのどこかに空きがあるか、いずれかの車がスタックしている場合、
@@ -216,8 +217,9 @@ public class Roundabout extends Intersection {
 		// 交差点サイト
 		for (int i = 0; i < 4; i++) {
 			if (roundabout[i] != null && roundabout[i].isDespawn()) {
-				roundabout[i].despawning();
+				Car carToDel = roundabout[i];
 				roundabout[i] = null;
+				carToDel.despawning();
 				deleted++;
 			}
 		}

@@ -91,6 +91,7 @@ public class FieldView extends JPanel {
 	void drawThis(Graphics g) {
 
 		Color[] colorSet = new Color[] {Color.RED, Color.BLUE, Color.MAGENTA, Color.DARK_GRAY};
+		int[] points = new int[4];
 
 		for (int x = 0; x < field.numX; x++) {
 			for (int y = 0; y < field.numY; y++) {
@@ -104,9 +105,11 @@ public class FieldView extends JPanel {
 						if (num == 1) {
 							int outIsec = field.getCarOut(x, y, isec, step);
 							if (outIsec == -1)
-								g.setColor(Color.BLUE);
-							else
+								g.setColor(Color.ORANGE);
+							else {
+								points[outIsec]++;
 								g.setColor(colorSet[outIsec]);
+							}
 						} else {
 							g.setColor(Color.WHITE);
 						}
@@ -116,6 +119,7 @@ public class FieldView extends JPanel {
 				}
 			}
 		}
+		// System.out.println("" + points[0] + " " + points[1] + " " + points[2] + " " + points[3]);
 	}
 
 	int[] calcPosition(int x, int y, int isec, int step) {
@@ -186,7 +190,7 @@ public class FieldView extends JPanel {
 
 	// 上質なグラフィックスを得るには最低2.0以上にする。
 	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
-	double R = 3.0; // ボールサイズ(半径)
+	double R = 1.5; // ボールサイズ(半径)
 
 	// 円を塗りつぶす：中心x、中心y、半径r
 	void fillCircle(Graphics g, double x, double y, double r) {
@@ -308,8 +312,8 @@ public class FieldView extends JPanel {
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(600);
-		Field field = new Field(10, 10, 5, 5);
-		field.initialize(300);
+		Field field = new Field(20, 16, 7, 10);
+		field.initialize(500);
 		view.draw(field);
 
 
@@ -317,8 +321,7 @@ public class FieldView extends JPanel {
 			int n = field.update();
 			System.out.println(n);
 			view.draw(field);
-			//view.textArea.setText(Car.carInfoAll());
-			wait(50);
+			wait(10);
 		}
 
 

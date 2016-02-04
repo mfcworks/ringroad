@@ -56,8 +56,8 @@ public class Car {
 		// 出発時は出発地にいる
 		current = new int[] {x, y, isec, step};
 
-		System.out.println("Car is being created:");
-		System.out.println("  origin: {" + origin[0] + "," + origin[1] + "," + origin[2] + "," + origin[3] + "}");
+		//System.out.println("Car is being created:");
+		//System.out.println("  origin: {" + origin[0] + "," + origin[1] + "," + origin[2] + "," + origin[3] + "}");
 
 		// 目的地を決定する
 		setDestination();
@@ -69,8 +69,10 @@ public class Car {
 		carList.add(this);
 
 		// DEBUG
-		System.out.println("  destination: {" + destination[0] + "," + destination[1] + "," + destination[2] + "," + destination[3] + "}");
-		routeInfo();
+		//System.out.println("  destination: {" + destination[0] + "," + destination[1] + "," + destination[2] + "," + destination[3] + "}");
+		///routeInfo();
+
+		if (outIsec() == -1) System.out.println("Car created with outIsec == -1");
 	}
 
 	/**
@@ -276,6 +278,9 @@ public class Car {
 
 	// 次の交差点で抜ける交差点番号を返す
 	public int outIsec() {
+		if (route[routeStep][ISEC] == -1) {
+			//System.out.println("route[routeStep][ISEC]は -1 です");
+		}
 		return route[routeStep][ISEC];
 	}
 
@@ -322,5 +327,6 @@ public class Car {
 	public void despawning() {
 		//System.out.println("車が消滅します");
 		carList.remove(this);
+		field.createCars(1);
 	}
 }
