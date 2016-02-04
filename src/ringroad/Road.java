@@ -67,4 +67,6 @@ public abstract class Road {
 	public abstract Car[] moveFromRoad(int n);
 
 	public abstract int tryDespawn();
+
+	public abstract int getCarOut(int step);
 }

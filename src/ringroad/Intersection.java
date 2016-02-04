@@ -53,4 +53,7 @@ public abstract class Intersection {
 	// 指定された交差点番号における道路の出口から車を移動させる
 	public abstract Car[] moveFromRoad(int isec, int n);
 
+	public abstract int getCarOut(int isec, int step);
+
+
 }

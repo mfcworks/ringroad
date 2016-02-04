@@ -93,7 +93,7 @@ public class Roundabout extends Intersection {
 		int moved = 0;
 
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] != null && roundabout[i].outIsec() == i) {
+			if (roundabout[i] != null && roundabout[i].outIsec() == i && !roundabout[i].isDespawn()) {
 				if (roads[i].tryExit(roundabout[i])) {
 					roundabout[i] = null;
 					moved++;
@@ -131,8 +131,10 @@ public class Roundabout extends Intersection {
 			Car temp = roundabout[3];
 			for (int i = 3; i > 0; i--) {
 				roundabout[i] = roundabout[i - 1];
+				roundabout[i].move(thisX, thisY, i, 0);
 			}
 			roundabout[0] = temp;
+			roundabout[0].move(thisX, thisY, 0, 0);
 			System.out.println("特殊パターンです");
 			return 4;
 		} else {
@@ -213,7 +215,7 @@ public class Roundabout extends Intersection {
 		int deleted = 0;
 		// 交差点サイト
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] != null && roundabout[i].tryDespawn()) {
+			if (roundabout[i] != null && roundabout[i].isDespawn()) {
 				roundabout[i].despawning();
 				roundabout[i] = null;
 				deleted++;
@@ -226,6 +228,14 @@ public class Roundabout extends Intersection {
 		}
 
 		return deleted;
+	}
+
+	public int getCarOut(int isec, int step) {
+		if (step == 0) {
+			return roundabout[isec].outIsec();
+		} else {
+			return roads[isec].getCarOut(step);
+		}
 	}
 
 }

@@ -121,12 +121,16 @@ public class SingleRoad extends Road {
 		int deleted = 0;
 
 		for (int i = 0; i < road.length; i++) {
-			if (road[i] != null && road[i].tryDespawn()) {
+			if (road[i] != null && road[i].isDespawn()) {
 				road[i].despawning();
 				road[i] = null;
 				deleted++;
 			}
 		}
 		return deleted;
+	}
+
+	public int getCarOut(int step) {
+		return road[step-1].outIsec();
 	}
 }

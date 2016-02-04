@@ -25,7 +25,7 @@ public class FieldView extends JPanel {
 	private JScrollPane scroll;
 	public JTextArea textArea;
 
-	public FieldView(int width, int height) {
+	public FieldView(int size) {
 		// メインウィンドウを作成
 		frame = new JFrame("Ringroad Simulator");
 		// 閉じるボタンで終了
@@ -35,23 +35,21 @@ public class FieldView extends JPanel {
 		// サイズ変更不可
 		frame.setResizable(false);
 		// サイズ設定
-		frame.setSize(width, height);
+		frame.setSize(size, size+60);
+
+		//frame.setLayout(null);
 
 		// 描画用パネルを追加
 		frame.add(this);
 
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setSize(60, 30);
+		textArea.setLocation(0, size);
+		//frame.add(textArea);
 		// ウィンドウを表示
 		frame.setVisible(true);
 
-		// for DEBUG
-		textFrame = new JFrame("Debug Window");
-		textArea = new JTextArea();
-		scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		textFrame.add(scroll);
-		textArea.setEditable(false);
-		textArea.setText("test");
-		textFrame.setSize(400, 300);
-		textFrame.setVisible(true);
 	}
 
 	/**
@@ -104,7 +102,11 @@ public class FieldView extends JPanel {
 						int num = field.getIntersection(x, y).numCarsByPosition(isec, step);
 
 						if (num == 1) {
-							g.setColor(Color.BLUE);
+							int outIsec = field.getCarOut(x, y, isec, step);
+							if (outIsec == -1)
+								g.setColor(Color.BLUE);
+							else
+								g.setColor(colorSet[outIsec]);
 						} else {
 							g.setColor(Color.WHITE);
 						}
@@ -295,26 +297,28 @@ public class FieldView extends JPanel {
 		}
 	}
 
+	public static void wait(int ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+		}
+	}
 
 	// test
 	public static void main(String[] args) {
 		FieldView view;
-		view = new FieldView(600, 600);
+		view = new FieldView(600);
 		Field field = new Field(10, 10, 5, 5);
-		field.initialize(100);
+		field.initialize(300);
 		view.draw(field);
 
 
 		while (true) {
-			field.update();
+			int n = field.update();
+			System.out.println(n);
 			view.draw(field);
-			view.textArea.setText(Car.carInfoAll());
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO 自動生成された catch ブロック
-				e.printStackTrace();
-			}
+			//view.textArea.setText(Car.carInfoAll());
+			wait(50);
 		}
 
 

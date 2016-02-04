@@ -131,6 +131,9 @@ public class Field {
 	}
 
 
+	int lastmoved = 0;
+	int zeromoved = 0;
+
 	/**
 	 * 系を1ステップ更新する。
 	 */
@@ -169,7 +172,15 @@ public class Field {
 			}
 		}
 
-		return -1;
+		if (lastmoved == 0 && moved == 0) {
+			zeromoved++;
+		}
+		lastmoved = moved;
+		if (zeromoved > 5) {
+			throw new RuntimeException();
+		}
+
+		return moved;
 	}
 
 
@@ -178,5 +189,12 @@ public class Field {
 	 */
 	public int numCarsByPosition(int x, int y, int isec, int step) {
 		return intersections[x][y].numCarsByPosition(isec, step);
+	}
+
+	/**
+	 * for Debug: get car dir(out intersection)
+	 */
+	public int getCarOut(int x, int y, int isec, int step) {
+		return intersections[x][y].getCarOut(isec, step);
 	}
 }

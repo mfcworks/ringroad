@@ -292,7 +292,7 @@ public class Car {
 	/**
 	 * この車が消滅するか？
 	 */
-	public boolean tryDespawn() {
+	public boolean isDespawn() {
 		if (current[X]    == destination[X] &&
 			current[Y]    == destination[Y] &&
 			current[ISEC] == destination[ISEC] &&
@@ -320,7 +320,7 @@ public class Car {
 	 * 車を消滅させる直前に呼び出します。
 	 */
 	public void despawning() {
-		System.out.println("車が消滅します");
+		//System.out.println("車が消滅します");
 		carList.remove(this);
 	}
 }
