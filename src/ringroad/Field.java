@@ -34,6 +34,14 @@ public class Field {
 	 */
 	public final int[] dX;
 
+	public Field() {
+		rc = numX = numY = dY = 0;
+		dX = null;
+	}
+	public void test() {
+		System.out.println(dY);
+	}
+
 	/**
 	 * コンストラクタ
 	 *
