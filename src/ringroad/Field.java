@@ -12,7 +12,7 @@ public class Field {
 	/**
 	 * 交差点の2次元配列
 	 */
-	private Intersection[][] intersections;
+	protected Intersection[][] intersections;
 
 	/**
 	 * 中心半径

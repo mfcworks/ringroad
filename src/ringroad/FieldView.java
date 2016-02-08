@@ -311,14 +311,15 @@ public class FieldView extends JPanel {
 
 	// 上質なグラフィックスを得るには最低2.0以上にする。
 	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
-	double R = 2.2; // ボールサイズ(半径)
+	double R = 3; // ボールサイズ(半径)
 
 	// test
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(600);
-		Field field = new Field(15, 10, 5, 10);
-		field.initialize(100);
+		int[] nums = {3, 2, 1, 1, 1};
+		Field field = new GradualField(15, 10, nums, 5);
+		field.initialize(400);
 		view.draw(field);
 
 
@@ -326,7 +327,7 @@ public class FieldView extends JPanel {
 			int n = field.update();
 			System.out.println(n);
 			view.draw(field);
-			wait(50);
+			wait(0);
 		}
 
 	}

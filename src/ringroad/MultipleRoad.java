@@ -69,13 +69,13 @@ public class MultipleRoad extends Road {
 			empties[i] = roadSites[i].emptySpace();
 		}
 		// 実際に車を移動させる
-		for (int i = 0; i < length - 1; i++) {
-			Car[] from = roadSites[i].dequeue(empties[i+1]);
+		for (int i = length-1; i >= 1; i--) {
+			Car[] from = roadSites[i-1].dequeue(empties[i]);
 			for (int j = 0; j < from.length; j++) {
-				from[j].move(thisX, thisY, thisIsec, i + 2);
+				from[j].move(thisX, thisY, thisIsec, i + 1);
 			}
 			moved += from.length;
-			roadSites[i+1].enqueue(from);
+			roadSites[i].enqueue(from);
 		}
 
 		return moved;
