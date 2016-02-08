@@ -1,5 +1,6 @@
 package ringroad;
 
+import java.awt.Color;
 import java.util.Random;
 
 /**
@@ -208,6 +209,13 @@ public class Field {
 	 */
 	public int numCarsByPosition(int x, int y, int isec, int step) {
 		return intersections[x][y].numCarsByPosition(isec, step);
+	}
+
+	/**
+	 * 同：色を取得する
+	 */
+	public Color getColor(int x, int y, int isec, int step) {
+		return intersections[x][y].getColor(isec, step);
 	}
 
 	/**

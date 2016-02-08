@@ -1,5 +1,7 @@
 package ringroad;
 
+import java.awt.Color;
+
 /**
  * 交差点クラスのためのインターフェース(実装上は抽象クラス)
  *
@@ -55,5 +57,6 @@ public abstract class Intersection {
 
 	public abstract int getCarOut(int isec, int step);
 
+	public abstract Color getColor(int isec, int step);
 
 }

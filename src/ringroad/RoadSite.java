@@ -11,25 +11,27 @@ public class RoadSite {
 	/*
 	 * この道路サイトの位置情報
 	 */
-	private int x;
-	private int y;
-	private int isec;
-	private int step;
+	private final int thisX;
+	private final int thisY;
+	private final int thisIsec;
+	private final int thisStep;
 
-
-	LinkedList<Car> list;
+	// Queueに入っている現在の車数はlist.size()で取得
+	private LinkedList<Car> list;
 
 	// Queueの容量(最大車数)
-	int nMax;
-	// Queueに入っている現在の車数はlist.size()で取得
-
+	private int nMax;
 
 	/**
 	 * コンストラクタ
 	 *
 	 * @param n Queueの容量(N車線分に相当)
 	 */
-	public RoadSite(int n) {
+	public RoadSite(int thisX, int thisY, int thisIsec, int thisStep, int n) {
+		this.thisX = thisX;
+		this.thisY = thisY;
+		this.thisIsec = thisIsec;
+		this.thisStep = thisStep;
 		nMax = n;
 		list = new LinkedList<Car>();
 	}
@@ -40,6 +42,7 @@ public class RoadSite {
 		return (nMax - list.size());
 	}
 
+	// 車の台数
 	public int size() {
 		return list.size();
 	}
@@ -95,7 +98,7 @@ public class RoadSite {
 	public boolean trySpawn() {
 		// listが満杯でなければ車を発生させる
 		if (list.size() != nMax) {
-			list.add(new Car(x, y, isec, step));
+			list.add(new Car(thisX, thisY, thisIsec, thisStep));
 			return true;
 		} else {
 			return false;
@@ -104,23 +107,19 @@ public class RoadSite {
 
 
 	// 車を消滅させる
-	public int despawn() {
+	public int tryDespawn() {
 		int num = 0;
 
 		// remove時に下に詰められるので、上から処理する
 		for (int i = list.size() - 1; i >= 0; i--) {
 			Car car = list.get(i);
-			if (car.curPosX == x &&
-				car.curPosY == y &&
-				car.curIsec == isec &&
-				car.curStep == step) {
+			if (car.isDespawn()) {
 				// 車を消滅させる
+				car.despawning();
 				list.remove(i);
 				num++;
 			}
 		}
 		return num;
 	}
-
-
 }

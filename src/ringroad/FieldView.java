@@ -35,7 +35,7 @@ public class FieldView extends JPanel {
 		// サイズ変更不可
 		frame.setResizable(false);
 		// サイズ設定
-		frame.setSize(size, size+60);
+		frame.setSize(size, size+24);
 
 		//frame.setLayout(null);
 
@@ -90,8 +90,8 @@ public class FieldView extends JPanel {
 
 	void drawThis(Graphics g) {
 
-		Color[] colorSet = new Color[] {Color.RED, Color.BLUE, Color.MAGENTA, Color.DARK_GRAY};
-		int[] points = new int[4];
+//		Color[] colorSet = new Color[] {Color.RED, Color.BLUE, Color.MAGENTA, Color.DARK_GRAY};
+//		int[] points = new int[4];
 
 		for (int x = 0; x < field.numX; x++) {
 			for (int y = 0; y < field.numY; y++) {
@@ -100,6 +100,8 @@ public class FieldView extends JPanel {
 //					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
 					for (int step = 0; step < stepMax; step++) {
 						int[] pos = calcPosition(x, y, isec, step);
+						Color color = field.getColor(x, y, isec, step);
+						/*
 						int num = field.getIntersection(x, y).numCarsByPosition(isec, step);
 
 						if (num == 1) {
@@ -110,10 +112,11 @@ public class FieldView extends JPanel {
 								points[outIsec]++;
 								g.setColor(colorSet[outIsec]);
 							}
+							g.setColor(Color.BLACK);//とりあえず
 						} else {
 							g.setColor(Color.WHITE);
-						}
-
+						}*/
+						g.setColor(color);
 						fillPoint(g, pos[0], pos[1]);
 					}
 				}
@@ -188,9 +191,6 @@ public class FieldView extends JPanel {
 
 
 
-	// 上質なグラフィックスを得るには最低2.0以上にする。
-	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
-	double R = 1.5; // ボールサイズ(半径)
 
 	// 円を塗りつぶす：中心x、中心y、半径r
 	void fillCircle(Graphics g, double x, double y, double r) {
@@ -308,12 +308,17 @@ public class FieldView extends JPanel {
 		}
 	}
 
+
+	// 上質なグラフィックスを得るには最低2.0以上にする。
+	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
+	double R = 2.2; // ボールサイズ(半径)
+
 	// test
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(600);
-		Field field = new Field(20, 16, 7, 10);
-		field.initialize(500);
+		Field field = new Field(15, 10, 5, 10);
+		field.initialize(100);
 		view.draw(field);
 
 
@@ -321,9 +326,8 @@ public class FieldView extends JPanel {
 			int n = field.update();
 			System.out.println(n);
 			view.draw(field);
-			wait(10);
+			wait(50);
 		}
-
 
 	}
 }

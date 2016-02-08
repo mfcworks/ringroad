@@ -1,5 +1,7 @@
 package ringroad;
 
+import java.awt.Color;
+
 /**
  * 道路サイトのためのインターフェース(実装上は抽象クラス)
  *
@@ -69,4 +71,7 @@ public abstract class Road {
 	public abstract int tryDespawn();
 
 	public abstract int getCarOut(int step);
+
+	// グラフィックスの描画色を返す「色選択関数」
+	public abstract Color colorFunction(int step);
 }

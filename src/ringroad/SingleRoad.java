@@ -1,5 +1,7 @@
 package ringroad;
 
+import java.awt.Color;
+
 /**
  * 一車線道路
  *
@@ -36,10 +38,11 @@ public class SingleRoad extends Road {
 
 
 	// 道路の入り口に何台入れるか
-	public int spaceEnter() {
+/*	public int spaceEnter() {
 		return (road[0] == null ? 1 : 0);
 	}
-
+*/
+	@Override
 	public int carsAt(int step) {
 		return (road[step - 1] == null ? 0 : 1);
 	}
@@ -51,6 +54,7 @@ public class SingleRoad extends Road {
 	/**
 	 * 内部サイトのアップデート
 	 */
+	@Override
 	public int updateInternal() {
 		int moved = 0; // 動いた台数
 
@@ -72,6 +76,7 @@ public class SingleRoad extends Road {
 	/**
 	 * 交差点から道路サイトへの車の移動を試みる
 	 */
+	@Override
 	public boolean tryExit(Car car) {
 		if (road[0] == null) {
 			// 移動成功
@@ -88,6 +93,7 @@ public class SingleRoad extends Road {
 	 * 道路サイトの出口から車を移動させる
 	 * (SingleRoadの場合は最大1台)
 	 */
+	@Override
 	public Car[] moveFromRoad(int n) {
 		int cap = (road[length-1] == null || lastMoved ? 0 : 1);
 		int num = Math.min(cap, n); //移動する台数
@@ -100,11 +106,10 @@ public class SingleRoad extends Road {
 	}
 
 
-
-
 	/**
 	 * 車の発生を試みる。
 	 */
+	@Override
 	public boolean trySpawn(int step) {
 		if (road[step - 1] == null) {
 			road[step - 1] = new Car(thisX, thisY, thisIsec, step);
@@ -117,6 +122,7 @@ public class SingleRoad extends Road {
 	/**
 	 * 車の消滅を行なう。
 	 */
+	@Override
 	public int tryDespawn() {
 		int deleted = 0;
 
@@ -131,8 +137,14 @@ public class SingleRoad extends Road {
 		return deleted;
 	}
 
+	@Override
 	public int getCarOut(int step) {
-		if (road[step-1]==null) throw new RuntimeException("Something happen");
+		if (road[step-1] == null) throw new RuntimeException("Something happen");
 		return road[step-1].outIsec();
+	}
+
+	@Override
+	public Color colorFunction(int step) {
+		return (road[step - 1] == null ? Color.WHITE : Color.BLACK);
 	}
 }

@@ -1,5 +1,7 @@
 package ringroad;
 
+import java.awt.Color;
+
 /**
  * ラウンドアバウト交差点を持つ交差点
  *
@@ -237,6 +239,17 @@ public class Roundabout extends Intersection {
 			return roundabout[isec].outIsec();
 		} else {
 			return roads[isec].getCarOut(step);
+		}
+	}
+
+	/**
+	 * 色を取得する
+	 */
+	public Color getColor(int isec, int step) {
+		if (step == 0) {
+			return (roundabout[isec] == null ? Color.WHITE : Color.BLACK);
+		} else {
+			return roads[isec].colorFunction(step);
 		}
 	}
 
