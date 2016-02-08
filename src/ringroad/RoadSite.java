@@ -11,16 +11,16 @@ public class RoadSite {
 	/*
 	 * この道路サイトの位置情報
 	 */
-	private final int thisX;
-	private final int thisY;
-	private final int thisIsec;
-	private final int thisStep;
+	protected final int thisX;
+	protected final int thisY;
+	protected final int thisIsec;
+	protected final int thisStep;
 
 	// Queueに入っている現在の車数はlist.size()で取得
-	private LinkedList<Car> list;
+	protected LinkedList<Car> list;
 
 	// Queueの容量(最大車数)
-	private int nMax;
+	private final int nMax;
 
 	/**
 	 * コンストラクタ

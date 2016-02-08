@@ -12,18 +12,9 @@ public class Roundabout extends Intersection {
 	// XXX: 暫定的に、交差点サイトは1車線としておく。
 	private Car[] roundabout;
 
-	// 道路サイトの配列
-	private Road[] roads;
 
 
 
-	// 隣接する交差点の配列
-	// 交差点番号 i から伸びる道路サイトが接続する交差点を neighbors[i] に格納する。
-	public Intersection[] neighbors;
-
-	public Intersection neighbor(int isec) {
-		return neighbors[isec];
-	}
 
 
 
@@ -54,27 +45,9 @@ public class Roundabout extends Intersection {
 		roundabout = new Car[4];
 	}
 
-	/**
-	 * 隣接する交差点を設定する
-	 * @param is0 この交差点の交差点番号0から伸びる道路サイトの先に接続する交差点
-	 * @param is1 この交差点の交差点番号1から伸びる道路サイトの先に接続する交差点
-	 * @param is2 この交差点の交差点番号2から伸びる道路サイトの先に接続する交差点
-	 * @param is3 この交差点の交差点番号3から伸びる道路サイトの先に接続する交差点
-	 */
-	public void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3) {
-		neighbors = new Intersection[] {is0, is1, is2, is3}; // 順番通りに格納
-	}
 
-	/**
-	 * 交差点を含まないサイト数を返す。
-	 */
-	public int lengthAt(int isec) {
-		if (roads[isec] == null) {
-			return 0;
-		} else {
-			return roads[isec].length;
-		}
-	}
+
+
 
 	/**
 	 * この交差点が持つ道路サイトの内部をアップデートする

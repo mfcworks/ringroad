@@ -294,6 +294,11 @@ public class Car {
 		System.out.println();
 	}
 
+	// 特定の場合に必要。
+	protected int[] getDestination() {
+		return destination;
+	}
+
 	/**
 	 * この車が消滅するか？
 	 */
@@ -327,6 +332,6 @@ public class Car {
 	public void despawning() {
 		//System.out.println("車が消滅します");
 		carList.remove(this);
-		field.createCars(1);
+		//field.createCars(1);
 	}
 }
