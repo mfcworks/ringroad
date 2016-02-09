@@ -317,17 +317,17 @@ public class FieldView extends JPanel {
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(600);
-		int[] nums = {3, 2, 1, 1, 1};
+		int[] nums = {3, 1, 1, 1, 1};
 		Field field = new GradualField(4, 10, nums, 5);
-		field.initialize(5);
+		field.initialize(100);
 		view.draw(field);
 
 
 		while (true) {
 			int n = field.update();
-			System.out.println(n);
+			//System.out.println(n);
 			view.draw(field);
-			wait(200);
+			wait(10);
 		}
 
 	}
