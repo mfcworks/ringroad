@@ -5,7 +5,6 @@ import java.util.Random;
 
 /**
  * 放射環状道路のモデルを表すクラス
- *
  */
 public class Field {
 
@@ -17,23 +16,23 @@ public class Field {
 	/**
 	 * 中心半径
 	 */
-	public final int rc;
+	public int rc;
 	/**
 	 * 放射道路の本数
 	 */
-	public final int numX;
+	public int numX;
 	/**
 	 * 環状道路の本数
 	 */
-	public final int numY;
+	public int numY;
 	/**
 	 * 放射道路の1区間の長さ
 	 */
-	public final int dY;
+	public int dY;
 	/**
 	 * 環状道路の1区間の長さ
 	 */
-	public final int[] dX;
+	public int[] dX;
 
 	/**
 	 * 継承クラスが呼び出す空コンストラクタ
@@ -43,6 +42,9 @@ public class Field {
 		dX = null;
 	}
 
+	/**
+	 * 1ステップあたりの発生台数
+	 */
 	private double spawnProb;
 
 	/**
@@ -56,13 +58,11 @@ public class Field {
 
 	/**
 	 * 密度を一定に保つかどうかを指定する。
-	 * 密度を一定に保つ場合、車が1台削除されたと同時に
-	 * 1台生成される。
+	 * 密度を一定に保つ場合、車が1台削除されたと同時に1台生成される。
 	 */
 	public void setConstantDensity(boolean cons) {
-
+		// 現時点では未実装
 	}
-
 
 	/** 車の台数 */
 	public int carCount;
@@ -75,7 +75,6 @@ public class Field {
 		return ((double) carCount) / siteCount;
 	}
 
-
 	/**
 	 * コンストラクタ
 	 *
@@ -85,7 +84,7 @@ public class Field {
 	 * @param dY   環状道路の1区間の長さ
 	 */
 	public Field(int rc, int numX, int numY, int dY) {
-		// 例によってField情報をCarに置いておく。
+		// Field情報をCarに置いておく。
 		Car.field = this;
 
 		this.numX = numX;
@@ -106,18 +105,17 @@ public class Field {
 			for (int y = 0; y < numY; y++) {
 				// 交差点番号0,2方向は、同心円上の環状道路部なので同じ長さ。
 				// 交差点番号1,3方向は、放射道路なので同じ長さ==dY。
-				// ただし、最内側と最外側は片方の放射道路を持たない。その場合は0を与える。
+				// ただし、最内側と最外側は片方の放射道路を持たない。
+				// その場合は0を与える。
 				int n02 = (int) Math.round((rc + (dY * y)) * 2 * Math.PI / numX);
 				int n1 = (y == 0 ? 0 : dY);
 				int n3 = (y == numY-1 ? 0 : dY);
 
 				dX[y] = n02;
 
-				// XXX: とりあえず全て1車線道路。
+				// Fieldクラスでは全て1車線道路。
 				intersections[x][y] = new Roundabout(x, y, n02, n1, n02, n3, 1, 1, 1, 1);
 				siteCount += n02 * 2 + n1 + n3 + 4;
-
-				//if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02);
 			}
 		}
 
@@ -132,7 +130,6 @@ public class Field {
 			}
 		}
 	}
-
 
 	/**
 	 * 位置(x, y)の交差点を取得します。
@@ -237,19 +234,6 @@ public class Field {
 		// 場合によっては車を発生
 		int n = (int) spawnProb + (Math.random() < (spawnProb % 1) ? 1 : 0);
 		createCars(n);
-
-		/*
-		if (lastmoved == 0 && moved == 0) {
-			zeromoved++;
-		}
-		lastmoved = moved;
-		if (zeromoved > 5) {
-			if (Car.carList.size() == 0)
-				System.exit(0);
-			throw new RuntimeException();
-
-		}
-		*/
 
 		return moved;
 	}

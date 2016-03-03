@@ -3,12 +3,10 @@ package ringroad;
 import java.awt.Color;
 
 /**
- * 一車線道路
+ * 一車線道路を定義するクラス
  *
  */
 public class SingleRoad extends Road {
-
-
 
 	/*
 	 * 道路サイトはCarの配列として表す。
@@ -31,17 +29,9 @@ public class SingleRoad extends Road {
 	 */
 	public SingleRoad(int thisX, int thisY, int thisIsec, int length) {
 		super(thisX, thisY, thisIsec, length);
-//		System.out.println("SingleRoad " + length + " at (" + thisX + "," + thisX + "," + thisIsec +")");
 		road = new Car[length];
 	}
 
-
-
-	// 道路の入り口に何台入れるか
-/*	public int spaceEnter() {
-		return (road[0] == null ? 1 : 0);
-	}
-*/
 	@Override
 	public int carsAt(int step) {
 		return (road[step - 1] == null ? 0 : 1);
@@ -62,7 +52,8 @@ public class SingleRoad extends Road {
 		for (int i = 0; i < road.length - 1; i++) {
 			if (road[i] != null && road[i+1] == null) {
 				road[i+1] = road[i];
-				road[i+1].move(thisX, thisY, thisIsec, i+2); //stepはroadのインデックスより1大きいため
+				road[i+1].move(thisX, thisY, thisIsec, i+2); // stepはroadのインデックス
+															 // より1大きいため
 				road[i] = null;
 				if (i == road.length-2) lastMoved = true;
 				i++;
@@ -107,7 +98,7 @@ public class SingleRoad extends Road {
 
 
 	/**
-	 * 車の発生を試みる。
+	 * 車の発生を試みる
 	 */
 	@Override
 	public boolean trySpawn(int step) {
@@ -120,7 +111,7 @@ public class SingleRoad extends Road {
 	}
 
 	/**
-	 * 車の消滅を行なう。
+	 * 車の消滅を行なう
 	 */
 	@Override
 	public int tryDespawn() {

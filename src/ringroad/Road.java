@@ -25,7 +25,6 @@ public abstract class Road {
 	 */
 	public final int length;
 
-
 	/**
 	 * コンストラクタ。道路サイトを作成する
 	 *
@@ -42,15 +41,17 @@ public abstract class Road {
 	}
 
 
-	//
+	/**
+	 * stepにいる車の台数を返す
+	 */
 	public abstract int carsAt(int step);
 
-	/*
+	/**
 	 * 道路の内部サイトをアップデートするメソッド
 	 */
 	public abstract int updateInternal();
 
-	/*
+	/**
 	 * 車を発生させることを試みる。
 	 * @param step 道路サイトのステップ番号: step > 0
 	 *             (∵ step == 0 は交差点サイトのため。)
@@ -58,12 +59,12 @@ public abstract class Road {
 	 */
 	public abstract boolean trySpawn(int step);
 
-	/*
+	/**
 	 * 道路サイトの入口に車を1台移動することを試みる
 	 */
 	public abstract boolean tryExit(Car car);
 
-	/*
+	/**
 	 * 道路サイトの出口から車を移動させる
 	 */
 	public abstract Car[] moveFromRoad(int n);
@@ -72,6 +73,8 @@ public abstract class Road {
 
 	public abstract int getCarOut(int step);
 
-	// グラフィックスの描画色を返す「色選択関数」
+	/**
+	 * グラフィックスの描画色を返す色選択関数
+	 */
 	public abstract Color colorFunction(int step);
 }

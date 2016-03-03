@@ -12,12 +12,6 @@ public class Roundabout extends Intersection {
 	// XXX: 暫定的に、交差点サイトは1車線としておく。
 	private Car[] roundabout;
 
-
-
-
-
-
-
 	public int numCarsByPosition(int isec, int step) {
 		if (step == 0)
 			return (roundabout[isec] == null ? 0 : 1);
@@ -32,21 +26,23 @@ public class Roundabout extends Intersection {
 	 * @param len0, len1, len2, len3 : 各交差点番号に接続する道路の長さ
 	 * @param n0, n1, n2, n3 : 各交差点番号に接続する道路の車線数
 	 */
-	public Roundabout(int thisX, int thisY, int len0, int len1, int len2, int len3, int n0, int n1, int n2, int n3) {
+	public Roundabout(int thisX, int thisY, int len0, int len1, int len2, int len3,
+			int n0, int n1, int n2, int n3) {
 		super(thisX, thisY);
 
 		// 道路サイトのオブジェクトを生成
 		roads = new Road[4];
-		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(thisX, thisY, 0, len0) : new MultipleRoad(thisX, thisY, 0, len0, n0)));
-		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(thisX, thisY, 1, len1) : new MultipleRoad(thisX, thisY, 1, len1, n1)));
-		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(thisX, thisY, 2, len2) : new MultipleRoad(thisX, thisY, 2, len2, n2)));
-		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(thisX, thisY, 3, len3) : new MultipleRoad(thisX, thisY, 3, len3, n3)));
+		roads[0] = (len0 == 0 ? null : (n0 == 1 ? new SingleRoad(thisX, thisY, 0, len0)
+									 : new MultipleRoad(thisX, thisY, 0, len0, n0)));
+		roads[1] = (len1 == 0 ? null : (n1 == 1 ? new SingleRoad(thisX, thisY, 1, len1)
+									 : new MultipleRoad(thisX, thisY, 1, len1, n1)));
+		roads[2] = (len2 == 0 ? null : (n2 == 1 ? new SingleRoad(thisX, thisY, 2, len2)
+									 : new MultipleRoad(thisX, thisY, 2, len2, n2)));
+		roads[3] = (len3 == 0 ? null : (n3 == 1 ? new SingleRoad(thisX, thisY, 3, len3)
+									 : new MultipleRoad(thisX, thisY, 3, len3, n3)));
 		// この交差点のサイト
 		roundabout = new Car[4];
 	}
-
-
-
 
 
 	/**
@@ -63,12 +59,15 @@ public class Roundabout extends Intersection {
 		return moved;
 	}
 
-	// 交差点から道路サイトへ抜ける車をアップデートする（自分の交差点内での操作）
+	/**
+	 *  交差点から道路サイトへ抜ける車をアップデートする（自分の交差点内での操作）
+	 */
 	public int updateExit() {
 		int moved = 0;
 
 		for (int i = 0; i < 4; i++) {
-			if (roundabout[i] != null && roundabout[i].outIsec() == i && !roundabout[i].isDespawn()) {
+			if (roundabout[i] != null && roundabout[i].outIsec() == i &&
+					!roundabout[i].isDespawn()) {
 				if (roads[i].tryExit(roundabout[i])) {
 					roundabout[i] = null;
 					moved++;
@@ -91,9 +90,9 @@ public class Roundabout extends Intersection {
 	 * 後者は動けないので動かさず、前者を動かす。
 	 */
 	public int updateIntersection() {
-		// XXX: とりあえず以下の特殊ルールを適用しておく。
-		// XXX: 2つの交差点と、それらの間の往復車線における全てのサイトに車が詰まるデッドロックが
-		// 発生したため、外に抜けられない交差点内の車はラウンドアバウトを回るルールに変更する。
+		// 特殊ルール：
+		// 2つの交差点と、それらの間の往復車線における全てのサイトに車が詰まるデッドロックが
+		// 発生したため、外に抜けられない交差点内の車はラウンドアバウトを回るルールに変更する
 		boolean flag = true;
 		for (int i = 0; i < 4; i++) {
 			if (roundabout[i] == null /*|| roundabout[i].outIsec() == i*/) {
@@ -103,8 +102,8 @@ public class Roundabout extends Intersection {
 		}
 
 		if (flag) {
-			// 全ての交差点サイトに車がいる場合、無条件に（抜けられる場合は前段で抜けているはずなので）
-			// それぞれをヌルっと動かす。
+			// 全ての交差点サイトに車がいる場合、無条件に
+			// （抜けられる場合は前段で抜けているはずなので）それぞれを動かす。
 			Car temp = roundabout[3];
 			for (int i = 3; i > 0; i--) {
 				roundabout[i] = roundabout[i - 1];
@@ -119,7 +118,8 @@ public class Roundabout extends Intersection {
 			int moved = 0;
 			for (int i = 0; i < 4; i++) {
 				int next = (i + 1) % 4;
-				if (roundabout[i] != null && roundabout[i].outIsec() != i && roundabout[next] == null) {
+				if (roundabout[i] != null && roundabout[i].outIsec() != i
+						&& roundabout[next] == null) {
 					roundabout[next] = roundabout[i];
 					roundabout[next].move(thisX, thisY, next, 0);
 					roundabout[i] = null;
@@ -148,7 +148,7 @@ public class Roundabout extends Intersection {
 	 */
 	public int updateEnter() {
 		int moved = 0;
-		// 交差点番号 i に接続されているのはneighbors[i]の交差点番号(i+1)%4。←ここがおかしかった。(i+2)%4は間違い
+		// 交差点番号 i に接続されているのはneighbors[i]の交差点番号(i+1)%4
 		for (int i = 0; i < 4; i++) {
 			int next = (i + 1) % 4;
 			int prev = (i + 3) % 4;
@@ -166,7 +166,7 @@ public class Roundabout extends Intersection {
 
 
 	/**
-	 * 車の発生を試みる。
+	 * 車の発生を試みる
 	 */
 	public boolean trySpawn(int isec, int step) {
 		if (step == 0) {
@@ -185,7 +185,7 @@ public class Roundabout extends Intersection {
 	}
 
 	/**
-	 * 車の消滅を行なう。
+	 * 車の消滅を行なう
 	 */
 	public int tryDespawn() {
 		int deleted = 0;

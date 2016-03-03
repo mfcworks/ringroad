@@ -3,12 +3,12 @@ package ringroad;
 import java.util.LinkedList;
 
 /**
- * 複数車線道路のための１サイトの車のQueue。
+ * 複数車線道路のための１サイトの車のキュー
  *
  */
 public class RoadSite {
 
-	/*
+	/**
 	 * この道路サイトの位置情報
 	 */
 	protected final int thisX;
@@ -25,7 +25,7 @@ public class RoadSite {
 	/**
 	 * コンストラクタ
 	 *
-	 * @param n Queueの容量(N車線分に相当)
+	 * @param n キューの容量(N車線分に相当)
 	 */
 	public RoadSite(int thisX, int thisY, int thisIsec, int thisStep, int n) {
 		this.thisX = thisX;
@@ -37,12 +37,16 @@ public class RoadSite {
 	}
 
 
-	// 空き容量(車数)を取得する
+	/**
+	 * 空き容量(車数)を取得する
+	 */
 	public int emptySpace() {
 		return (nMax - list.size());
 	}
 
-	// 車の台数
+	/**
+	 *  車の台数
+	 */
 	public int size() {
 		return list.size();
 	}
@@ -51,13 +55,12 @@ public class RoadSite {
 	// 車の移動
 	//====================
 
-
-	// 車の追加
+	/**
+	 *  キューに車を追加する
+	 */
 	public void enqueue(Car car) {
 		enqueue(new Car[]{ car });
 	}
-
-	// 複数台の車の追加
 
 	/**
 	 * 移動してくる車をキューに追加する
@@ -70,7 +73,6 @@ public class RoadSite {
 			list.add(carsToMove[i]);
 		}
 	}
-
 
 	/**
 	 * 移動させる車をキューから取り除く
@@ -89,12 +91,13 @@ public class RoadSite {
 		return carsToMove;
 	}
 
-
 	//====================
 	// 発生と消滅
 	//====================
 
-	// 車の発生を試みる
+	/**
+	 *  車の発生を試みる
+	 */
 	public boolean trySpawn() {
 		// listが満杯でなければ車を発生させる
 		if (list.size() != nMax) {
@@ -106,7 +109,9 @@ public class RoadSite {
 	}
 
 
-	// 車を消滅させる
+	/**
+	 *  車を消滅させる
+	 */
 	public int tryDespawn() {
 		int num = 0;
 

@@ -53,7 +53,8 @@ public abstract class Intersection {
 	 * @param is2 この交差点の交差点番号2から伸びる道路サイトの先に接続する交差点
 	 * @param is3 この交差点の交差点番号3から伸びる道路サイトの先に接続する交差点
 	 */
-	public void connect(Intersection is0, Intersection is1, Intersection is2, Intersection is3) {
+	public void connect(Intersection is0, Intersection is1,
+			Intersection is2, Intersection is3) {
 		neighbors = new Intersection[] {is0, is1, is2, is3}; // 順番通りに格納
 	}
 
@@ -71,28 +72,28 @@ public abstract class Intersection {
 	public abstract int numCarsByPosition(int isec, int step);
 
 
-	// 内部アップデートを行なう
+	/** 道路サイト内のアップデートを行なう */
 	public abstract int updateRoadSites();
 
-	// 交差点から出て行くアップデート
+	/** 交差点から出て行く車のアップデートを行なう */
 	public abstract int updateExit();
 
-
+	/** 交差点内の車のアップデートを行なう */
 	public abstract int updateIntersection();
 
+	/** 交差点に入ってくる車のアップデートを行なう */
 	public abstract int updateEnter();
 
-	// 車の発生を試みる
+	/** 車の発生を試みる */
 	public abstract boolean trySpawn(int isec, int step);
 
-	// 車の消滅を行なう。
+	/** 車の消滅を行なう。*/
 	public abstract int tryDespawn();
 
-	// 指定された交差点番号における道路の出口から車を移動させる
+	/** 指定された交差点番号における道路の出口から車を移動させる */
 	public abstract Car[] moveFromRoad(int isec, int n);
 
 	public abstract int getCarOut(int isec, int step);
 
 	public abstract Color getColor(int isec, int step);
-
 }

@@ -5,8 +5,6 @@ import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 /**
  * 放射環状道路の可視化クラス
@@ -17,36 +15,30 @@ public class FieldView extends JPanel {
 	private JFrame frame;
 	private Field field;
 
-	private JFrame textFrame;
-
 	private Car car;
 
 	private int drawMode;
-	private JScrollPane scroll;
-	public JTextArea textArea;
 
+	/**
+	 * コンストラクタ
+	 * 描画ウィンドウを初期化して表示する
+	 *
+	 * @param size ウィンドウの一辺の長さ(ピクセル単位)
+	 */
 	public FieldView(int size) {
 		// メインウィンドウを作成
 		frame = new JFrame("Ringroad Simulator");
 		// 閉じるボタンで終了
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// ウィンドウ位置のデフォルト化
-		//frame.setLocationByPlatform(true);
+		frame.setLocationByPlatform(true);
 		// サイズ変更不可
 		frame.setResizable(false);
 		// サイズ設定
 		frame.setSize(size, size+24);
 
-		//frame.setLayout(null);
-
 		// 描画用パネルを追加
 		frame.add(this);
-
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setSize(60, 30);
-		textArea.setLocation(0, size);
-		//frame.add(textArea);
 		// ウィンドウを表示
 		frame.setVisible(true);
 
@@ -87,44 +79,30 @@ public class FieldView extends JPanel {
 		}
 	}
 
-
+	/**
+	 * Fieldの現在の状態を描画する
+	 *
+	 */
 	void drawThis(Graphics g) {
-
-//		Color[] colorSet = new Color[] {Color.RED, Color.BLUE, Color.MAGENTA, Color.DARK_GRAY};
-//		int[] points = new int[4];
-
 		for (int x = 0; x < field.numX; x++) {
 			for (int y = 0; y < field.numY; y++) {
 				for (int isec = 0; isec < 4; isec++) {
 					int stepMax = field.getIntersection(x, y).lengthAt(isec) + 1;
-//					System.out.println("x="+x+" y="+y+" isec="+isec+" step="+stepMax);
 					for (int step = 0; step < stepMax; step++) {
 						int[] pos = calcPosition(x, y, isec, step);
 						Color color = field.getColor(x, y, isec, step);
-						/*
-						int num = field.getIntersection(x, y).numCarsByPosition(isec, step);
-
-						if (num == 1) {
-							int outIsec = field.getCarOut(x, y, isec, step);
-							if (outIsec == -1)
-								g.setColor(Color.ORANGE);
-							else {
-								points[outIsec]++;
-								g.setColor(colorSet[outIsec]);
-							}
-							g.setColor(Color.BLACK);//とりあえず
-						} else {
-							g.setColor(Color.WHITE);
-						}*/
 						g.setColor(color);
 						fillPoint(g, pos[0], pos[1]);
 					}
 				}
 			}
 		}
-		// System.out.println("" + points[0] + " " + points[1] + " " + points[2] + " " + points[3]);
 	}
 
+	/**
+	 * Field内の車の座標(x,y,isec,step)から描画ウィンドウ内の描画位置を求める
+	 *
+	 */
 	int[] calcPosition(int x, int y, int isec, int step) {
 		// 交差点位置yの高度での環状道路の1区間のサイト数
 		int dx = (int) Math.round((field.rc + (field.dY * y)) * 2 * Math.PI / field.numX);
@@ -179,7 +157,6 @@ public class FieldView extends JPanel {
 			break;
 		}
 
-
 		// 描画パネルの中心座標
 		int cx = getWidth() / 2;
 		int cy = getHeight() / 2;
@@ -190,9 +167,14 @@ public class FieldView extends JPanel {
 	}
 
 
-
-
-	// 円を塗りつぶす：中心x、中心y、半径r
+	/**
+	 * 中心(x, y), 半径rの円を塗りつぶす
+	 *
+	 * @param g 描画対象のGraphics
+	 * @param x 中心のx座標
+	 * @param y 中心のy座標
+	 * @param r 半径r
+	 */
 	void fillCircle(Graphics g, double x, double y, double r) {
 		int xx = (int) Math.round(x - r);
 		int yy = (int) Math.round(y - r);
@@ -200,6 +182,13 @@ public class FieldView extends JPanel {
 		g.fillOval(xx, yy, rr, rr);
 	}
 
+	/**
+	 * 小さな固定サイズのドットを打ち込む
+	 *
+	 * @param g 描画対象のGraphics
+	 * @param x 中心のx座標
+	 * @param y 中心のy座標
+	 */
 	void fillDot(Graphics g, int x, int y) {
 		g.fillRect(x, y, 1, 1);
 		g.fillRect(x, y-1, 1, 1);
@@ -208,7 +197,13 @@ public class FieldView extends JPanel {
 		g.fillRect(x+1, y, 1, 1);
 	}
 
-	// プロット点（大きさによって切り替え）
+	/**
+	 * プロット点を描画する（大きさによってメソッドを切り替える）
+	 *
+	 * @param g 描画対象のGraphics
+	 * @param x 中心のx座標
+	 * @param y 中心のy座標
+	 */
 	void fillPoint(Graphics g, int x, int y) {
 		if (R < 2) {
 			fillDot(g, x, y);
@@ -217,6 +212,7 @@ public class FieldView extends JPanel {
 		}
 	}
 
+	// テスト(デバッグ用)
 	public void test(Graphics g, int numX, int numY, int rc) {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -268,24 +264,15 @@ public class FieldView extends JPanel {
 				double rx = R * Math.sin(2*Math.PI*numy/numY);
 				double ry = R * Math.cos(2*Math.PI*numy/numY);
 
-				//fillCircle(g, x-rx, y+ry, R);
-				//fillCircle(g, x+rx, y-ry, R);
-				// どっちもどっちか？
-			//	fillPoint(g, (int) (x-rx), (int) (y+ry));
-			//	fillPoint(g, (int) (x+rx), (int) (y-ry));
 				fillPoint(g, (int) Math.round(x-rx), (int) Math.round(y+ry));
 				fillPoint(g, (int) Math.round(x+rx), (int) Math.round(y-ry));
 			}
 		}
 	}
 
-	public void drawCarRoute(Car car) {
-		this.car = car;
-		drawMode = 1;
-		repaint();
-	}
-
-	// グラフィックスが上書きできない問題
+	/**
+	 *  車の経路情報を描画する(デバッグ用)
+	 */
 	public void drawCarRoute(Graphics g) {
 		int[][] route = car.route;
 		int i = 0;
@@ -298,6 +285,11 @@ public class FieldView extends JPanel {
 		}
 	}
 
+	/**
+	 * スレッドの実行をmsミリ秒停止する
+	 *
+	 * @param ms 停止する時間(ミリ秒単位)
+	 */
 	public static void wait(int ms) {
 		try {
 			Thread.sleep(ms);
@@ -305,28 +297,11 @@ public class FieldView extends JPanel {
 		}
 	}
 
-
 	// 上質なグラフィックスを得るには最低2.0以上にする。
-	// コンパクトにしたければ、多少荒くてもよければ1.8を指定する。
-	double R = 3; // ボールサイズ(半径)
+	// コンパクトにしたければ、多少荒くてもよければ1.8程度に指定する。
+	/**
+	 * プロット点サイズ
+	 */
+	double R = 3; // プロット点サイズ
 
-	// test
-	public static void main(String[] args) {
-		FieldView view;
-		view = new FieldView(600);
-		int[] nums = {3,2,1,1};
-		Field field = new GradualField(10, 10, nums, 5);
-		//field.initialize(0.2);
-		field.setSpawnProbability(5);
-		view.draw(field);
-
-		wait(5000);
-		for (int step = 0; ; step++) {
-			int n = field.update();
-			System.out.println(field.getDensity());
-			view.draw(field);
-			wait(10);
-		}
-
-	}
 }

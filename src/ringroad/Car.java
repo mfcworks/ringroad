@@ -2,10 +2,16 @@ package ringroad;
 
 import java.util.Random;
 
+/**
+ * 車の発生、消滅、経路情報を管理するクラス
+ *
+ */
 public class Car {
 
+	/**
+	 * Fieldへのグローバルな参照
+	 */
 	public static Field field;
-
 
 	// int[4] の位置情報の配列のインデックスには次の定数を用いる
 	private static final int X = 0;
@@ -13,20 +19,20 @@ public class Car {
 	private static final int ISEC = 2;
 	private static final int STEP = 3;
 
-
 	/**
 	 * 出発地の位置(x, y, isec, step)
 	 */
 	private int[] origin;
+
 	/**
 	 * 目的地の位置(x, y, isec, step)
 	 */
 	private int[] destination;
+
 	/**
 	 * 現在位置(x, y, isec, step)
 	 */
 	private int[] current;
-
 
 	/**
 	 * 経路情報
@@ -35,12 +41,16 @@ public class Car {
 	 * route[i][ISEC]は i番目に通る交差点を抜ける交差点番号を格納する。
 	 */
 	public int[][] route;
+
+	/**
+	 * 経路の現在のステップ
+	 */
 	private int routeStep;
 
 	/**
-	 * コンストラクタ。
-	 * 出発地を指定して車を作成します。
-	 * 目的地はランダムに決定されます。
+	 * コンストラクタ
+	 * 出発地を指定して車を作成する。
+	 * 目的地はランダムに決定される。
 	 *
 	 * @param x    出発地のx座標
 	 * @param y    出発地のy座標
@@ -63,7 +73,7 @@ public class Car {
 	}
 
 	/**
-	 * 目的地をランダムに決定します。
+	 * 目的地をランダムに決定する。
 	 */
 	private void setDestination() {
 		Random random = new Random();
@@ -90,13 +100,13 @@ public class Car {
 
 	/**
 	 * 出発地から目的地までの経路を決定し、経路情報を
-	 * 配列変数 route に格納します。
+	 * 配列変数 route に格納する
 	 */
 	private void setRoute() {
 		int numX = field.numX;
 		int numY = field.numY;
 
-		// とりあえずroute変数は最大数+少し余裕を持って確保しておく。
+		// とりあえずroute変数は最大数+少し余裕を持って確保しておく
 		route = new int[numX/2 + numY*2 + 2][3];
 
 		// 特例: 同じ道路サイト内の場合(交差点サイトを全く通らない場合)
@@ -117,7 +127,8 @@ public class Car {
 			origX = origin[X];
 			origY = origin[Y];
 		} else {
-			Intersection temp = field.getIntersection(origin[X], origin[Y]).neighbor(origin[ISEC]);
+			Intersection temp = field.getIntersection(origin[X], origin[Y])
+					.neighbor(origin[ISEC]);
 			origX = temp.thisX;
 			origY = temp.thisY;
 		}
@@ -155,8 +166,8 @@ public class Car {
 			ring = 0;
 		} else if (origX < destX) {
 			int t = destX - origX;
-			ring = (t <= numX/2 ? t : t-numX); /*ここが逆っぽい？*/
-		} else /* @when (origX > destX) */ {
+			ring = (t <= numX/2 ? t : t-numX);
+		} else /* (origX > destX) の場合 */ {
 			int t = origX - destX;
 			ring = (t <= numX/2 ? -t : numX-t);
 		}
@@ -191,7 +202,6 @@ public class Car {
 			outbound = 0;
 		}
 
-
 		// これ以降、実際に経路をセットしていく
 		int idx = 0;
 		// 出発地を代入
@@ -213,8 +223,8 @@ public class Car {
 			idx++;
 			// その結果たどり着く交差点
 			route[idx][X] = (ring > 0 ?
-					/*正回り*/ (route[idx-1][X]==numX-1 ? 0 : route[idx-1][X]+1) :
-					/*負回り*/ (route[idx-1][X]==0 ? numX-1 : route[idx-1][X]-1));
+				/*正回り*/ (route[idx-1][X]==numX-1 ? 0 : route[idx-1][X]+1) :
+				/*負回り*/ (route[idx-1][X]==0 ? numX-1 : route[idx-1][X]-1));
 			route[idx][Y] = route[idx-1][Y];
 		}
 
@@ -228,20 +238,28 @@ public class Car {
 		}
 
 		if (route[idx][X] != destination[X] || route[idx][Y] != destination[Y])
-			throw new RuntimeException("ルート生成に失敗しました：" + route[idx][X]
-					+ "!=" + destination[X] + " or " + route[idx][Y] + "!=" + destination[Y]);
+			throw new RuntimeException("ルート生成に失敗しました："
+					+ route[idx][X] + "!=" + destination[X]
+					+ " or " + route[idx][Y] + "!=" + destination[Y]);
 
 		// 最後の交差点を抜ける方向
 		route[idx][ISEC] = destination[ISEC];
 
-		// とりあえず最後にダミー値を入れておく。
+		// とりあえず最後にダミー値を入れておく
 		idx++;
 		route[idx][X] = -1;
 		route[idx][Y] = -1;
 		route[idx][ISEC] = -1;
 	}
 
-	// 車を1サイト動かしたときに呼び出す。
+	/**
+	 * 車を1サイト動かした時に呼び出す。
+	 *
+	 * @param newX    移動後のX座標
+	 * @param newY    移動後のY座標
+	 * @param newIsec 移動後のIsec値
+	 * @param newStep 移動後のStep値
+	 */
 	public void move(int newX, int newY, int newIsec, int newStep) {
 		if (current[STEP] == 0 && newStep != 0) {
 			// 交差点を抜けたとき
@@ -261,18 +279,16 @@ public class Car {
 		current[STEP] = newStep;
 	}
 
-
-
-	// 次の交差点で抜ける交差点番号を返す
+	/**
+	 * 次の交差点で抜ける交差点番号を返す
+	 */
 	public int outIsec() {
-		if (route[routeStep][ISEC] == -1) {
-			//System.out.println("route[routeStep][ISEC]は -1 です");
-		}
 		return route[routeStep][ISEC];
 	}
 
-
-	// 経路情報をコンソールに出力します。
+	/**
+	 * 経路情報をコンソールに出力する（デバッグ用）
+	 */
 	public void routeInfo() {
 		for (int i = 0; ; i++) {
 			if (route[i][0] == -1) break;
@@ -281,13 +297,15 @@ public class Car {
 		System.out.println();
 	}
 
-	// 特定の場合に必要。
+	/**
+	 * 目的地の座標を返す
+	 */
 	protected int[] getDestination() {
 		return destination;
 	}
 
 	/**
-	 * この車が消滅するか？
+	 * この車が消滅するかどうかを判定する
 	 */
 	public boolean isDespawn() {
 		if (current[X]    == destination[X] &&
@@ -299,16 +317,12 @@ public class Car {
 			return false;
 	}
 
-	public String carInfo() {
-		return "routeStep = " + routeStep;
-	}
-
-
 	/**
-	 * 車を消滅させる直前に呼び出します。
+	 * 車を消滅させる直前に呼び出される
 	 */
 	public void despawning() {
 		field.carCount--;
+	//	車の数を一定に保つ場合は、ここで車を1台発生させる
 	//	field.createCars(1);
 	}
 }

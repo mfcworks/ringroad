@@ -3,24 +3,25 @@ package ringroad;
 import java.awt.Color;
 
 /**
- * 多車線道路
+ * 複数車線道路を定義するクラス
  *
- *  0 1 2 ...           (n-1)
- * ┌┬┬┬┬┬┬┬┬┬┬┐
- * ├┼┼┼┼┼┼┼┼┼┼┤
- * ├┼┼┼┼┼┼┼┼┼┼┤
- * └┴┴┴┴┴┴┴┴┴┴┘
  */
 public class MultipleRoad extends Road {
-
 	/*
-	 * 道路サイトはQueue<Car>の配列として表す。
+	 * 複数車線道路のイメージ
 	 *
+	 *  0 1 2 ...           (n-1)
+	 * ┌┬┬┬┬┬┬┬┬┬┬┐
+	 * ├┼┼┼┼┼┼┼┼┼┼┤
+	 * ├┼┼┼┼┼┼┼┼┼┼┤
+	 * └┴┴┴┴┴┴┴┴┴┴┘
+	 */
+
+	/**
+	 * 道路サイトはCarのキューの配列として表す。
 	 * 道路長は roadSites.length で取得する。
 	 */
 	private RoadSite[] roadSites;
-
-
 
 	/**
 	 * コンストラクタ
@@ -144,9 +145,8 @@ public class MultipleRoad extends Road {
 			return Color.BLACK;
 		case 2:
 			return Color.MAGENTA;
-		default: /* above 3 */
+		default: /* over 3 */
 			return Color.RED;
 		}
 	}
-
 }
