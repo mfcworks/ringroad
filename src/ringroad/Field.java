@@ -35,13 +35,46 @@ public class Field {
 	 */
 	public final int[] dX;
 
+	/**
+	 * 継承クラスが呼び出す空コンストラクタ
+	 */
 	public Field() {
 		rc = numX = numY = dY = 0;
 		dX = null;
 	}
-	public void test() {
-		System.out.println(dY);
+
+	private double spawnProb;
+
+	/**
+	 * 1ステップごとに確率的に発生させる車の台数を設定する。
+	 *
+	 * @param prob 1ステップに発生させる車の台数
+	 */
+	public void setSpawnProbability(double prob) {
+		spawnProb = prob;
 	}
+
+	/**
+	 * 密度を一定に保つかどうかを指定する。
+	 * 密度を一定に保つ場合、車が1台削除されたと同時に
+	 * 1台生成される。
+	 */
+	public void setConstantDensity(boolean cons) {
+
+	}
+
+
+	/** 車の台数 */
+	public int carCount;
+
+	/** 全サイト数 */
+	public int siteCount;
+
+	/** 密度を取得する */
+	public double getDensity() {
+		return ((double) carCount) / siteCount;
+	}
+
 
 	/**
 	 * コンストラクタ
@@ -65,8 +98,8 @@ public class Field {
 		dX = new int[numY];
 
 		// DEBUG
-		System.out.println("Field initializing...");
-		System.out.println("放射道路の区間長: " + dY);
+		//System.out.println("Field initializing...");
+		//System.out.println("放射道路の区間長: " + dY);
 
 		// 交差点オブジェクトの生成
 		for (int x = 0; x < numX; x++) {
@@ -82,8 +115,9 @@ public class Field {
 
 				// XXX: とりあえず全て1車線道路。
 				intersections[x][y] = new Roundabout(x, y, n02, n1, n02, n3, 1, 1, 1, 1);
+				siteCount += n02 * 2 + n1 + n3 + 4;
 
-				if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02);
+				//if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02);
 			}
 		}
 
@@ -122,11 +156,12 @@ public class Field {
 	 */
 	public void createCars(int n) {
 		Random random = new Random();
+		int maxTrial = 50;
 
 		for (int i = 0; i < n; i++) {
 			int rx, ry, ri, rs;
 			boolean flag = false;
-			do {
+			for (int j = 0; (j < maxTrial && !flag); j++) {
 				rx = random.nextInt(numX);
 				ry = random.nextInt(numY);
 				ri = random.nextInt(4);
@@ -134,7 +169,8 @@ public class Field {
 				if (ni == 0) continue;
 				rs = random.nextInt(ni);
 				flag = intersections[rx][ry].trySpawn(ri, rs);
-			} while(!flag);
+			}
+			if (!flag) throw new RuntimeException("車を発生できません。");
 		}
 	}
 
@@ -145,6 +181,15 @@ public class Field {
 	 */
 	public void initialize(int n) {
 		createCars(n);
+	}
+
+	/**
+	 * 初期状態を、初期密度を指定して設定する。ランダムな位置に車を配置する
+	 *
+	 * @param dens 初期密度(0.0 <= dens <= 1.0)
+	 */
+	public void initialize(double dens) {
+		createCars((int) (dens * siteCount));
 	}
 
 
@@ -189,6 +234,11 @@ public class Field {
 			}
 		}
 
+		// 場合によっては車を発生
+		int n = (int) spawnProb + (Math.random() < (spawnProb % 1) ? 1 : 0);
+		createCars(n);
+
+		/*
 		if (lastmoved == 0 && moved == 0) {
 			zeromoved++;
 		}
@@ -199,6 +249,7 @@ public class Field {
 			throw new RuntimeException();
 
 		}
+		*/
 
 		return moved;
 	}

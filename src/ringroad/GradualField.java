@@ -66,8 +66,9 @@ public class GradualField extends Field {
 					// 環状道路のみ指定された車線とする。
 					// 放射道路は全て1車線とする。
 					intersections[x][y] = new Roundabout(x, y, n02, n1, n02, n3, numY[y], m1, numY[y], m3);
+					siteCount += n02*numY[y]*2 + n1*m1 + n3*m3 + 4;
 
-					if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02 + ", 車線数: " + numY[y]);
+				//	if (x == 0) System.out.println("環状道路" + y + "の区間長: " + n02 + ", 車線数: " + numY[y]);
 				}
 			}
 

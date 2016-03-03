@@ -1,14 +1,11 @@
 package ringroad;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 public class Car {
 
 	public static Field field;
 
-	public static List<Car> carList = new LinkedList<Car>();
 
 	// int[4] の位置情報の配列のインデックスには次の定数を用いる
 	private static final int X = 0;
@@ -56,23 +53,13 @@ public class Car {
 		// 出発時は出発地にいる
 		current = new int[] {x, y, isec, step};
 
-		//System.out.println("Car is being created:");
-		//System.out.println("  origin: {" + origin[0] + "," + origin[1] + "," + origin[2] + "," + origin[3] + "}");
-
 		// 目的地を決定する
 		setDestination();
 		// 経路を決定する
 		setRoute();
 		routeStep = 0;
 
-		// リストに追加
-		carList.add(this);
-
-		// DEBUG
-		//System.out.println("  destination: {" + destination[0] + "," + destination[1] + "," + destination[2] + "," + destination[3] + "}");
-		///routeInfo();
-
-		if (outIsec() == -1) System.out.println("Car created with outIsec == -1");
+		field.carCount++;
 	}
 
 	/**
@@ -316,22 +303,12 @@ public class Car {
 		return "routeStep = " + routeStep;
 	}
 
-	public static String carInfoAll() {
-		String br = System.getProperty("line.separator");
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < carList.size(); i++) {
-			sb.append(carList.get(i).carInfo());
-			sb.append(br);
-		}
-		return sb.toString();
-	}
 
 	/**
 	 * 車を消滅させる直前に呼び出します。
 	 */
 	public void despawning() {
-		//System.out.println("車が消滅します");
-		carList.remove(this);
-		field.createCars(1);
+		field.carCount--;
+	//	field.createCars(1);
 	}
 }

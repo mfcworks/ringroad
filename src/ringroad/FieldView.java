@@ -31,7 +31,7 @@ public class FieldView extends JPanel {
 		// 閉じるボタンで終了
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// ウィンドウ位置のデフォルト化
-		frame.setLocationByPlatform(true);
+		//frame.setLocationByPlatform(true);
 		// サイズ変更不可
 		frame.setResizable(false);
 		// サイズ設定
@@ -254,7 +254,6 @@ public class FieldView extends JPanel {
 			double y = (cy + radius * Math.sin(2*Math.PI*i/n));
 			//fillCircle(g, x, y, R);
 			fillPoint(g, (int) x, (int) y);
-
 		}
 
 		numY = 8;
@@ -276,10 +275,8 @@ public class FieldView extends JPanel {
 			//	fillPoint(g, (int) (x+rx), (int) (y-ry));
 				fillPoint(g, (int) Math.round(x-rx), (int) Math.round(y+ry));
 				fillPoint(g, (int) Math.round(x+rx), (int) Math.round(y-ry));
-
 			}
 		}
-
 	}
 
 	public void drawCarRoute(Car car) {
@@ -317,15 +314,16 @@ public class FieldView extends JPanel {
 	public static void main(String[] args) {
 		FieldView view;
 		view = new FieldView(600);
-		int[] nums = {3, 1, 1, 1, 1};
-		Field field = new GradualField(4, 10, nums, 5);
-		field.initialize(100);
+		int[] nums = {3,2,1,1};
+		Field field = new GradualField(10, 10, nums, 5);
+		//field.initialize(0.2);
+		field.setSpawnProbability(5);
 		view.draw(field);
 
-
-		while (true) {
+		wait(5000);
+		for (int step = 0; ; step++) {
 			int n = field.update();
-			//System.out.println(n);
+			System.out.println(field.getDensity());
 			view.draw(field);
 			wait(10);
 		}
